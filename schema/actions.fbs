@@ -13,7 +13,7 @@ table AccountAddAccount {
 }
 
 table AccountAddSignatories {
-  to_account:  [ubyte] (required); // uuid, username@domain, username
+  to_account:  [ubyte]      (required); // uuid, username@domain
   signatories: [Signature] (required);
 }
 
@@ -90,52 +90,20 @@ table PeerDeactivate {
   pubkey: string (required);
 }
 
-// used by root, It is needed private key lost. Register new key-pair
-//table AccountMigrate{
-//    account:    [ubyte] (required, nested_flatbuffer: "Account");
-//    prevPubKey: string;
-//}
-
-// users are able to store custom data in their accounts
-//table AccountStore {
-//    accPubKey: string           (required);
-//    data:      [KeyValueObject] (required);
-//}
-//////////////////////////////////////////
-
-//////////////////////////////////////////
-/// Commands for Chaincode
-//table ChaincodeAdd {
-//    code: [ubyte] (required, nested_flatbuffer: "Chaincode");
-//}
-//
-//table ChaincodeRemove {
-//    code_name: string (required);
-//    domain_name: string  (required);
-//    ledger_name: string  (required);
-//}
-//
-//table ChaincodeExecute {
-//  code_name:   string  (required);
-//  domain_name: string  (required);
-//  ledger_name: string  (required);
-//}
-//////////////////////////////////////////
-
 
 //////////////////////////////////////////
 /// Commands for Permission
 
 table PermissionAdd {
     // This account will be changed permission. If targetAccount is null, All account will be changed
-    targetAccount:   string;
-    permission:      AccountPermission;
+    targetAccountUuid:  string;
+    permission:         AccountPermission;
 }
 table PermissionRemove {
 
     // This account will be changed permission. If targetAccount is null, All account will be changed
-    targetAccount:   string;
-    permission:      AccountPermission;
+    targetAccountUuid:  string;
+    permission:         AccountPermission;
 }
 //////////////////////////////////////////
 
@@ -145,7 +113,6 @@ union Action {
   AccountAddSignatories,
   AccountRemoveSignatories,
   AccountSetQuorum,
-//  AccountMigrate,
 
   AssetCreate,
   AssetRemove,
@@ -163,10 +130,6 @@ union Action {
   PeerChangeTrust,
   PeerActivate,
   PeerDeactivate,
-
-// ChaincodeAdd,
-// ChaincodeRemove,
-// ChaincodeExecute,
 
   PermissionRemove,
   PermissionAdd
