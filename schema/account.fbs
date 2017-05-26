@@ -11,12 +11,13 @@ table Account {
   username:     string  (required);
 
   // Where should be permissions?
-  root:                 AccountPermissionRoot;
-  ledgerPermissions:    [AccountPermissionLedgerWrapper];
-  domainPermissions:    [AccountPermissionDomainWrapper];
-  assetPermissions:     [AccountPermissionAssetWrapper];
+  permission:   [Permission];
 }
 
+table Permission {
+    actionType: ubyte (required); //(Enum class ActionType)
+    allow:      bool  (required);
+}
 
 // message represents custom user data, related to account. User is able to store blobs in his account and access it by key.
 // e.g.,
@@ -28,7 +29,7 @@ table Account {
 //  }
 //}
 table Message {
-  accPubKey: string (required);
+  uuid: string (required);
 
   // values can be accessed by key for O(log(n)). Look at "Storing maps" section in flatbuffers docs
   data: [KeyValueObject];
