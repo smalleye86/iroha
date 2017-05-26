@@ -13,6 +13,8 @@ table Transaction {
   // And, Transaction contains array of objects Action. So, Action needs to be wrapped by ActionWrapper.
   // https://github.com/google/flatbuffers/commit/b0752e179bdbae516125cccacd7aebcfd83033a9
   actions: [ActionWrapper] (required);
+
+  attachment: Attachment;
 }
 
 table Attachment {
