@@ -2,19 +2,20 @@ include "primitives.fbs";
 
 namespace protocol;
 
-table ComplexAsset {
-  domain:       string;
+table Asset {
+  domain_name:  string;
   name:         string;
   uuid:         [ubyte];
+
   prop:         [KeyValueObject]; // using this, you can create complex assets
 }
 
-
-table Asset {
+table Currency {
+  domain_name:  string;
   name:         string;
   uuid:         [ubyte];
+
   amount:       [ubyte]; // limited to 256 bytes. Is this required?
   precision:    ubyte;
   options:      string;
-  domain:       string;
 }
