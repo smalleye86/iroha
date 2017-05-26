@@ -1,19 +1,16 @@
 include "primitives.fbs";
 include "asset.fbs";
 
-namespace iroha;
-
+namespace protocol;
 
 table Account {
-  pubKey: string (required);  // primary key for account
-  prevPubKey: string (required);    // pubkey for account before migrate account
-  alias:  string;
+  uuid:         [ubyte] (required); // 32 bytes
+  //pubkey:     string  (required); // Which is used, uuid or pubkey?
+  quorum:       ubyte;              // 1 byte
+  signatories:  [ubyte] (required); // 32 bytes
+  username:     string  (required);
 
-  // for m-n multisignature scheme
-  // signatories.size() = n, useKeys = m
-  signatories: [string]; // signatories are for multisig
-  useKeys:     ushort = 1;
-
+  // Where should be permissions?
   root:                 AccountPermissionRoot;
   ledgerPermissions:    [AccountPermissionLedgerWrapper];
   domainPermissions:    [AccountPermissionDomainWrapper];

@@ -1,18 +1,8 @@
-namespace iroha;
-
+namespace protocol;
 
 /////////////////////////////////////
 enum ProgrammingLanguage: ubyte {Java8} // Really we use Java8?
-
 table Chaincode {
-  // (ledger:domain:chaincode) is a primary key
-  code_name:   string  (required, key);  // sorted
-  domain_name: string  (required);
-  ledger_name: string  (required);
-
-  language:    ProgrammingLanguage;
-  code:        [ubyte];   // .class, whatever
-  hash:        [ubyte];   // hash of .class
 }
 
 /////////////////////////////////////
@@ -25,7 +15,6 @@ table KeyValueObject {
 
 /////////////////////////////////////
 /// Permissions
-
 
 table AccountPermissionRoot {
   ledger_add:    bool;  // ability to create new ledgers
@@ -88,19 +77,15 @@ union AccountPermission { AccountPermissionRoot, AccountPermissionLedger, Accoun
 /// Peer
 
 table Peer {
-  ledger_name:     string (required);
-
-  publicKey:       string (required);  // sorted; primary key.
-  ip:              string;
-  trust:           double;
-  active:          bool;
-  join_ledger:     bool; // Suggest It is always true.
+  pubkey:          string (required);  // sorted; primary key.
+  ip:              string (required);  // max size 15 bytes
+  trust:           double;             // 8 bytes
+  active:          bool;               // 1 byte
 }
 /////////////////////////////////////
 
 table Signature {
-  publicKey:  string;
-  signature:  [ubyte];   // signature is sign(sha256(tx.hash + timestamp))
-  timestamp:   ulong;
+  pubkey: [ubyte] (required); // blob (32 bytes)
+  sig:    [ubyte] (required); // blob (44 bytes)
 }
 
