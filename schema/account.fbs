@@ -14,10 +14,6 @@ table Account {
   permission:   [Permission];
 }
 
-table Permission {
-    actionType: ubyte (required); //(Enum class ActionType)
-    allow:      bool  (required);
-}
 
 // message represents custom user data, related to account. User is able to store blobs in his account and access it by key.
 // e.g.,
