@@ -6,13 +6,9 @@ namespace protocol;
 file_identifier "IROH";
 file_extension  "iroha";
 
-enum RPCResponseCode: short {
-  OK, InternalError, BadRequest
-}
-
 table SumeragiResponse {
   message:   string;
-  code:      RPCResponseCode;
+  code:      ResponseCode;
   signature: Signature;
 }
 

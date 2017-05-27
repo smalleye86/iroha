@@ -6,6 +6,7 @@ namespace protocol;
 file_identifier "IROH";
 file_extension  "iroha";
 
+enum ResponseCode: ubyte {OK, FAIL}
 enum BlockState: ubyte {COMMIT, FAIL, UNDECIDED}
 
 table Block {
@@ -32,5 +33,6 @@ table TransactionResponse {
 
 table ReceiverConfirmation {
   signature: Signature;
+  code:      ResponseCode;
   hash:      [ubyte];
 }
