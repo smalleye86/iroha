@@ -53,7 +53,7 @@ table AssetSubtract {
 table AssetSetPermissions {
   account_id:  string (required);
   asset_id:    string (required);
-  permissions: ulong;
+  permission:  Permission (required);
 }
 
 table DomainCreate {
@@ -68,7 +68,7 @@ table DomainRemove {
 table DomainSetPermissions {
   domain_id: string (required);
   account_id: string (required);
-  permissions: ulong; // bitstring
+  permission: Permission (required);
 }
 
 table PeerAdd {
