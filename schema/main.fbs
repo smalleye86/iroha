@@ -7,7 +7,7 @@ file_identifier "IROH";
 file_extension  "iroha";
 
 enum ResponseCode: ubyte {OK, FAIL}
-enum BlockState: ubyte {COMMIT, FAIL, UNDECIDED}
+enum BlockState: ubyte {COMMIT, UNCOMMITTED}
 
 table Block {
   txs:          [TransactionWrapper] (required);
