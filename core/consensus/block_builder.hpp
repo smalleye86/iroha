@@ -26,11 +26,9 @@ constexpr int MaxTxs = 2 * 1e7; // (1LL << 32) - 1;
 
 namespace sumeragi {
 
-using byte_array_t = std::vector<uint8_t>;
-
 struct Signature {
-  std::string publicKey;
-  std::string signature;
+  std::vector<uint8_t> publicKey;
+  std::vector<uint8_t> signature;
 };
 
 enum class BlockState {
@@ -39,7 +37,7 @@ enum class BlockState {
 };
 
 struct Block {
-  std::vector <byte_array_t> txs;
+  std::vector <std::vector<uint8_t>> txs;
   std::vector <Signature> peer_sigs;
   uint64_t created; // timestamp
   BlockState state;
@@ -48,7 +46,7 @@ struct Block {
 class BlockBuilder {
 public:
   BlockBuilder();
-  BlockBuilder& setTxs(const std::vector<byte_array_t>& txs);
+  BlockBuilder& setTxs(const std::vector<std::vector<uint8_t>>& txs);
   BlockBuilder& setBlock(const Block& block);
   BlockBuilder& addSignature(const Signature& sig);
   Block build();
@@ -73,7 +71,7 @@ private:
 
   // initWithBlock
   Block block_;
-  std::vector <Signature> peer_sigs;
+  std::vector <Signature> peer_sigs_;
   BlockState state_;
 };
 

@@ -22,7 +22,7 @@
 namespace sumeragi {
 
 BlockBuilder::BlockBuilder() {}
-BlockBuilder& BlockBuilder::setTxs(const std::vector<byte_array_t>& txs)
+BlockBuilder& BlockBuilder::setTxs(const std::vector<std::vector<uint8_t>>& txs)
 {
   if (txs.size() >= MaxTxs)
     throw std::runtime_error("");
@@ -43,7 +43,7 @@ BlockBuilder& BlockBuilder::addSignature(const Signature& sig) {
     throw std::runtime_error("");
   if (buildStatus_ & BuildStatus::withSignature)
     throw std::runtime_error("");
-  peer_sigs.push_back(sig);
+  peer_sigs_.push_back(sig);
   return *this;
 }
 
@@ -53,7 +53,7 @@ Block BlockBuilder::build() {
     if (buildStatus_ != BuildStatus::blockFromTxs) {
       throw std::runtime_error("");
     }
-    return Block {txs_, {}, datetime::unixtime(), State::uncommitted};
+    return Block {txs_, {}, datetime::unixtime(), BlockState::uncommitted};
   }
   else if (buildStatus_ & BuildStatus::initWithBlock) {
     if (buildStatus_ != BuildStatus::blockFromBlock) {
@@ -71,7 +71,7 @@ Block BlockBuilder::buildCommit() {
     if (buildStatus_ != BuildStatus::commit) {
       throw std::runtime_error("");
     }
-    block_.state = State::committed;
+    block_.state = BlockState::committed;
     return block_;
   }
 }

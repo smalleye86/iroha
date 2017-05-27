@@ -22,7 +22,7 @@ using namespace sumeragi;
 
 TEST(block_builder_test, to_block) {
 
-  std::vector<byte_array_t> txs;
+  std::vector<std::vector<uint8_t>> txs;
 
   auto block = BlockBuilder()
     .setTxs(txs)
@@ -35,7 +35,7 @@ TEST(block_builder_test, to_block) {
 
 TEST(block_builder_test, over_capacity) {
 //  std::vector<byte_array_t> txs(1LL << 32); // but block can have maximum tx size is 2^32-1. over!
-  std::vector<byte_array_t> txs(MaxTxs);
+  std::vector<std::vector<uint8_t>> txs(MaxTxs);
 
   ASSERT_THROW({
   auto block = BlockBuilder()
@@ -45,7 +45,7 @@ TEST(block_builder_test, over_capacity) {
 }
 
 TEST(block_builder_test, no_signature) {
-  std::vector<byte_array_t> txs; // None
+  std::vector<std::vector<uint8_t>> txs; // None
   auto block = sumeragi::BlockBuilder()
     .setTxs(txs)
     .build();
