@@ -5,7 +5,6 @@ namespace protocol;
 
 table Account {
   uuid:         [ubyte] (required); // 32 bytes
-  //pubkey:     string  (required); // Which is used, uuid or pubkey?
   quorum:       ubyte;              // 1 byte
   signatories:  [ubyte] (required); // 32 bytes
   username:     string  (required);
@@ -30,4 +29,3 @@ table Message {
   // values can be accessed by key for O(log(n)). Look at "Storing maps" section in flatbuffers docs
   data: [KeyValueObject];
 }
-

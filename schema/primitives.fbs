@@ -13,8 +13,8 @@ table KeyValueObject {
 /// Permissions
 
 table Permission {
-    actionType: ubyte (required); //(Enum class ActionType)
-    allow:      bool  (required);
+    actionType: ubyte; // required (Enum class ActionType)
+    allow:      bool;  // required
 }
 
 /////////////////////////////////////

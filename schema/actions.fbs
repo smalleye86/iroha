@@ -7,7 +7,6 @@ namespace protocol;
 //////////////////////////////////////////
 /// Commands for Account
 table AccountAddAccount {
-  username:    string (required);
   signatories: [Signature] (required);
   quorum:      ubyte;
 }
@@ -42,26 +41,34 @@ table AssetTransfer {
 }
 
 table AssetAdd {
-  receiver: string (required);
+  account: string (required);
   asset: Asset (required);
 }
 
 table AssetSubtract {
-  receiver: string (required);
-  asset: Asset (required);
+  account: string (required);
+  asset:   Asset (required);
+}
+
+table AssetSetPermissions {
+  account_id:  string (required);
+  asset_id:    string (required);
+  permissions: ulong;
 }
 
 table DomainCreate {
-  domain_name: string (required);
+  domain: string (required);
+  root_account: string (required);
 }
 
 table DomainRemove {
-  domain_remove: string (required);
+  domain: string (required);
 }
 
-table DomainRegisterAsset {
-  domain_name: string (required);
-  asset_name: string (required);
+table DomainSetPermissions {
+  domain_id: string (required);
+  account_id: string (required);
+  permissions: ulong; // bitstring
 }
 
 table PeerAdd {
@@ -97,13 +104,13 @@ table PeerDeactivate {
 table PermissionAdd {
     // This account will be changed permission. If targetAccount is null, All account will be changed
     targetAccountUuid:  string;
-    permission:         AccountPermission;
+    permission:         Permission;
 }
 table PermissionRemove {
 
     // This account will be changed permission. If targetAccount is null, All account will be changed
     targetAccountUuid:  string;
-    permission:         AccountPermission;
+    permission:         Permission;
 }
 //////////////////////////////////////////
 
@@ -119,10 +126,13 @@ union Action {
   AssetTransfer,
   AssetAdd,
   AssetSubtract,
+  AssetSetPermissions,
 
   DomainCreate,
   DomainRemove,
-  DomainRegisterAsset,
+//  DomainSetPermissionsDomainId,
+//  DomainSetPermissionsAccountId,
+//  DomainSetPermissionsBitString,
 
   PeerAdd,
   PeerRemove,
@@ -139,5 +149,5 @@ union Action {
 // And, Transaction contains array of objects Action. So, Action needs to be wrapped by ActionWrapper.
 // https://github.com/google/flatbuffers/commit/b0752e179bdbae516125cccacd7aebcfd83033a9
 table ActionWrapper {
-    action: Action;
+  action: Action;
 }
