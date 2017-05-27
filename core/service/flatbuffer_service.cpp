@@ -19,18 +19,62 @@
 #include <flatbuffers/flatbuffers.h>
 #include <main_generated.h>
 
+#include <vector>
+
 namespace flatbuffer_service {
 
-sumeragi::Block unpackBlock(const protocol::Block& block) {
+sumeragi::Block unpackBlock(const protocol::Block& flatbuf) {
   sumeragi::Block ret;
-  ret.txs = std::vector<sumeragi::byte_array_t>(
-    block.txs()->begin(),
-    block.txs()->end()
-  );
-  ret.state = sumeragi::State::uncommitted;
+  ret.txs = {};
+  for (const auto& txw: *flatbuf.txs()) {
+    ret.txs.emplace_back(
+      txw->tx()->begin(),
+      txw->tx()->end()
+    );
+  }
+  ret.state = sumeragi::BlockState::uncommitted;
   ret.peer_sigs = {};
-  //ret.
+  ret.created = datetime::unixtime();
   return ret;
 }
 
+std::vector<uint8_t> packBlock(
+  const sumeragi::Block& block,
+  const std::vector<uint8_t>& prev_hash,
+  int length,
+  const std::vector<uint8_t>& merkle_root,
+  int height
+) {
+  flatbuffers::FlatBufferBuilder fbb;
+
+  std::vector<flatbuffers::Offset<protocol::TransactionWrapper>> txs;
+  for (auto& tx: block.txs) {
+    txs.push_back(protocol::CreateTransactionWrapperDirect(fbb, &tx));
+  }
+
+  std::vector<flatbuffers::Offset<protocol::Signature>> peer_sigs;
+  for (auto& sig: block.peer_sigs) {
+    auto sigoffset = protocol::CreateSignatureDirect(
+      fbb,
+      &sig.publicKey,
+      &sig.signature
+    );
+    peer_sigs.push_back(sigoffset);
+  }
+
+  auto blockoffset = protocol::CreateBlockDirect(
+    fbb, &txs, &peer_sigs,
+    &prev_hash, length, &merkle_root,
+    height, block.created,
+    block.state == sumeragi::BlockState::committed ?
+      protocol::BlockState::COMMITTED :
+      protocol::BlockState::UNCOMMITTED
+  );
+
+  fbb.Finish(blockoffset);
+
+  auto buf = fbb.GetBufferPointer();
+  return {buf, buf + fbb.GetSize()};
 }
+
+} // namespace flatbuffer_service
