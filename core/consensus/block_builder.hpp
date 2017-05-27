@@ -21,7 +21,7 @@
 #include <utils/datetime.hpp>
 #include <vector>
 
-// Document's requred size = 2^32 - 1
+// Document's required size = 2^32 - 1
 constexpr int MaxTxs = 2 * 1e7; // (1LL << 32) - 1;
 
 namespace sumeragi {
@@ -33,7 +33,7 @@ struct Signature {
   std::string signature;
 };
 
-enum class State {
+enum class BlockState {
   committed,
   uncommitted
 };
@@ -42,7 +42,7 @@ struct Block {
   std::vector <byte_array_t> txs;
   std::vector <Signature> peer_sigs;
   uint64_t created; // timestamp
-  State state;
+  BlockState state;
 };
 
 class BlockBuilder {
@@ -74,7 +74,7 @@ private:
   // initWithBlock
   Block block_;
   std::vector <Signature> peer_sigs;
-  State state_;
+  BlockState state_;
 };
 
 };

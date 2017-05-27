@@ -19,8 +19,12 @@ set(IROHA_SCHEMA_DIR "${PROJECT_SOURCE_DIR}/schema")
 
 include("cmake/dependencies.cmake")
 
-include_directories(core)
+include_directories(
+  ${PROJECT_SOURCE_DIR}/core
+  ${IROHA_SCHEMA_DIR}
+)
 add_subdirectory(core)
+add_subdirectory(schema)
 
 link_directories(${PROJECT_BINARY_DIR}/lib)
 

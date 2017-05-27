@@ -30,7 +30,7 @@ TEST(block_builder_test, to_block) {
 
   assert(block.peer_sigs.size() == 0);
   assert(block.txs.size() == txs.size());
-  assert(block.state == State::uncommitted);
+  assert(block.state == BlockState::uncommitted);
 }
 
 TEST(block_builder_test, over_capacity) {
