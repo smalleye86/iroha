@@ -147,31 +147,6 @@ if(TESTING)
   add_dependencies(gtest google_test)
 endif()
 
-
-###############################
-#         cappuccino          #
-###############################
-ExternalProject_Add(mizukisonoko_cappuccino
-  GIT_REPOSITORY    "https://github.com/MizukiSonoko/Cappuccino.git"
-  GIT_TAG           "featue/asio"
-  BUILD_COMMAND     "" # remove build step, header only lib
-  CONFIGURE_COMMAND "" # remove configure step
-  INSTALL_COMMAND   "" # remove install step
-  TEST_COMMAND      "" # remove test step
-  UPDATE_COMMAND    "" # remove update step
-  )
-ExternalProject_Get_Property(mizukisonoko_cappuccino source_dir)
-set(cappuccino_SOURCE_DIR "${source_dir}")
-
-# since it is header only, we changed STATIC to INTERFACE below
-add_library(cappuccino INTERFACE IMPORTED)
-set_target_properties(cappuccino PROPERTIES
-  INTERFACE_INCLUDE_DIRECTORIES ${cappuccino_SOURCE_DIR}
-  )
-add_dependencies(cappuccino mizukisonoko_cappuccino json asio)
-
-
-
 ##############################
 #         benchmark          #
 ##############################
@@ -200,63 +175,6 @@ if(BENCHMARKING)
     )
   add_dependencies(benchmark google_benchmark)
 endif(BENCHMARKING)
-
-
-
-
-########################################################
-# jni
-########################################################
-add_library(jni SHARED IMPORTED)
-if (DEFINED ENV{JAVA_HOME})
-  if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(_JVM_INCLUDE_PATH "$ENV{JAVA_HOME}/include/darwin")
-    set_target_properties(jni PROPERTIES
-            INTERFACE_INCLUDE_DIRECTORIES "${_JVM_INCLUDE_PATH};$ENV{JAVA_HOME}/include"
-            IMPORTED_LOCATION "$ENV{JAVA_HOME}/jre/lib/server/libjvm.dylib"
-            )
-  else()
-    set(_JVM_INCLUDE_PATH "$ENV{JAVA_HOME}/include/linux")
-    set_target_properties(jni PROPERTIES
-            INTERFACE_INCLUDE_DIRECTORIES "${_JVM_INCLUDE_PATH};$ENV{JAVA_HOME}/include"
-            IMPORTED_LOCATION "$ENV{JAVA_HOME}/jre/lib/amd64/server/libjvm.so"
-            )
-  endif()
-
-else()
-  find_package(JNI)
-  if (!JNI_FOUND)
-    message(FATAL_ERROR "JVM not found")
-  endif()
-  set_target_properties(jni PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES "${JAVA_INCLUDE_PATH}"
-    IMPORTED_LOCATION "${JAVA_JVM_LIBRARY}"
-  )
-endif()
-
-
-
-#########################
-#         asio          #
-#########################
-ExternalProject_Add(chriskohlhoff_asio
-  GIT_REPOSITORY    "https://github.com/chriskohlhoff/asio.git"
-  CONFIGURE_COMMAND "" # remove configure step
-  BUILD_COMMAND     "" # remove build step
-  INSTALL_COMMAND   "" # remove install step
-  TEST_COMMAND      "" # remove test step
-  UPDATE_COMMAND    "" # remove update step
-  )
-ExternalProject_Get_Property(chriskohlhoff_asio source_dir)
-set(asio_SOURCE_DIR "${source_dir}")
-
-add_library(asio INTERFACE IMPORTED)
-file(MAKE_DIRECTORY ${asio_SOURCE_DIR}/asio/include)
-set_target_properties(asio PROPERTIES
-  INTERFACE_INCLUDE_DIRECTORIES ${asio_SOURCE_DIR}/asio/include
-)
-add_dependencies(asio chriskohlhoff_asio)
-
 
 
 ###############################
@@ -321,7 +239,6 @@ set_target_properties(spdlog PROPERTIES
 add_dependencies(spdlog gabime_spdlog)
 
 
-
 #########################
 #         grpc          #
 #########################
@@ -371,40 +288,4 @@ set_target_properties(grpc++ PROPERTIES
 
 if(NOT grpc_FOUND)
   add_dependencies(grpc grpc_grpc)
-endif()
-
-
-
-
-###########################
-#         LMDB            #
-###########################
-find_package(LMDB)
-
-if(NOT LMDB_FOUND)
-  ExternalProject_Add(lmdb_LMDB
-    GIT_REPOSITORY    "https://github.com/LMDB/lmdb.git"
-    GIT_TAG           "LMDB_0.9.19"
-    CONFIGURE_COMMAND ""
-    BUILD_IN_SOURCE   1
-    BUILD_COMMAND     cd libraries/liblmdb && $(MAKE) liblmdb.a  CC="${CMAKE_C_COMPILER}" "OPT=-fPIC -O3"
-    INSTALL_COMMAND   "" # remove install step
-    TEST_COMMAND      "" # remove test step
-    UPDATE_COMMAND    "" # remove update step
-    )
-  ExternalProject_Get_Property(lmdb_LMDB source_dir)
-  set(LMDB_INCLUDE_DIRS ${source_dir}/libraries/liblmdb)
-  set(LMDB_LIBRARIES ${source_dir}/libraries/liblmdb/liblmdb.a)
-  file(MAKE_DIRECTORY ${LMDB_INCLUDE_DIRS})
-endif()
-
-add_library(LMDB STATIC IMPORTED)
-set_target_properties(LMDB PROPERTIES
-  INTERFACE_INCLUDE_DIRECTORIES ${LMDB_INCLUDE_DIRS}
-  IMPORTED_LOCATION ${LMDB_LIBRARIES}
-  IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-  )
-
-if(NOT LMDB_FOUND)
-  add_dependencies(LMDB lmdb_LMDB)
 endif()
