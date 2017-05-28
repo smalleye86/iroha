@@ -16,7 +16,7 @@ table Block {
   length:       uint;
   merkle_root:  [ubyte] (required);
   height:       ulong;
-  created:      [ubyte] (required);
+  created:      ulong; // Require 64 bit to solve year 2038 problem
   block_state:  BlockState;
 }
 

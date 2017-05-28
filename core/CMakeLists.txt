@@ -1,2 +1,6 @@
+add_subdirectory(consensus)
+add_subdirectory(crypto)
+add_subdirectory(infra)
+add_subdirectory(service)
 add_subdirectory(validator)
 add_subdirectory(utils)
