@@ -26,30 +26,23 @@
 #include <crypto/base64.hpp>
 #include <crypto/signature.hpp>
 
+std::random_device seed_gen;
+std::mt19937    rnd_gen_32(seed_gen());
+std::mt19937_64 rnd_gen_64(seed_gen());
+
 // return random value of [min, max]
 inline int32_t random_value_32(int32_t min, int32_t max) {
   assert(min <= max);
-  return rand() % (max - min) + min;
-  /*
-  std::mt19937 rnd_gen_32;
-  std::cout << min << ", " << max << std::endl;
-  assert(min <= max);
   std::uniform_int_distribution<int32_t> dist(min, max);
   return dist(rnd_gen_32);
-   */
 }
 
-//std::mt19937_64 rnd_gen_64(seed_gen());
-/*
 // return random value of [min, max]
-inline int random_value_64(int min, int max) {
-  // FIXME: doesn't work
-  std::cout << min << ", " << max << std::endl;
+inline int random_value_64(uint64_t min, uint64_t max) {
   assert(min <= max);
-  std::uniform_int_distribution<int64_t> dist(min, max);
+  std::uniform_int_distribution<uint64_t> dist(min, max);
   return dist(rnd_gen_64);
 }
-*/
 
 namespace generator {
 
@@ -114,8 +107,7 @@ inline std::string random_asset_id() {
 }
 
 inline uint64_t random_time() {
-//  return random_value_64(0LL, 1LL << 62);
-  return random_value_32(0LL, 1LL << 29);
+  return random_value_64(0ULL, 1ULL << 63);
 }
 
 inline uint32_t random_nonce() {
