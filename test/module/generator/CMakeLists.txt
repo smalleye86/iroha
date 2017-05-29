@@ -4,7 +4,6 @@ target_link_libraries(tx_generator_test
     flatbuffers
     crypto
     signature
-    random
 )
 add_test(
     NAME tx_generator_test
