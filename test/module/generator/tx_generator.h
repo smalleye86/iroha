@@ -26,6 +26,9 @@
 #include <crypto/base64.hpp>
 #include <crypto/signature.hpp>
 
+// This is for test and header only. It is better to crate tx_generator.cpp in tools.
+
+// #include <utils/random.hpp>
 std::random_device seed_gen;
 std::mt19937    rnd_gen_32(seed_gen());
 std::mt19937_64 rnd_gen_64(seed_gen());
@@ -38,7 +41,7 @@ inline int32_t random_value_32(int32_t min, int32_t max) {
 }
 
 // return random value of [min, max]
-inline int random_value_64(uint64_t min, uint64_t max) {
+inline uint64_t random_value_64(uint64_t min, uint64_t max) {
   assert(min <= max);
   std::uniform_int_distribution<uint64_t> dist(min, max);
   return dist(rnd_gen_64);

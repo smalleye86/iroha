@@ -20,10 +20,14 @@ limitations under the License.
 #include <random>
 #include "../crypto/hash.hpp"
 
+// FIXME: namespace name is confusing (*_service, but in utils)
+// please give it the best name.
 namespace random_service {
-
 std::string makeHashByMT19937();
 
-};  // namespace random_service
+int32_t random_value_32(int32_t min, int32_t max);
+
+uint64_t random_value_64(uint64_t min, uint64_t max);
+}  // namespace random_service
 
 #endif
