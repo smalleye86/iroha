@@ -306,6 +306,9 @@ std::string toString(const protocol::Transaction& tx) {
     };
 
   for (auto const& act: *tx.actions()) {
+    if (action_to_strings.find(act->action_type()) == action_to_strings.end()) {
+      throw std::runtime_error("The action's dump is not implemented yet.");
+    }
     res += action_to_strings[act->action_type()](act->action());
   }
 
