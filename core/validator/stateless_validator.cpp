@@ -35,32 +35,37 @@ void receive(std::function<void(const sumeragi::Block&)> dispatcher) {
   dispatchToSumeragi = dispatcher;
 }
 
-void StatelessValidator::addValidator(const validator_t& validator) {
-  validators_.push_back(validator);
-}
+bool test_tx(const protocol::Transaction& tx) {
+  StatelessValidator<protocol::Transaction> validator;
 
-bool StatelessValidator::test(const sumeragi::Block& block) {
-  bool res = true;
-  for (const auto& verify: validators_) {
-    res = res && verify(block);
-  }
-  return res;
+  validator.addValidator([](const protocol::Transaction& tx) -> bool {
+    return true;
+  });
+
+  return validator.test(tx);
 }
 
 bool test(const sumeragi::Block& block) {
 
-  StatelessValidator validator;
+  StatelessValidator<sumeragi::Block> validator;
 
+  // verify block.txs
   validator.addValidator([](const sumeragi::Block& block) -> bool {
     for (auto const& tx: block.txs) {
+      // verify tx flatbuf
       flatbuffers::Verifier verifier(tx.data(), tx.size());
       if (!verifier.VerifyBuffer<protocol::Transaction>()) {
+        return false;
+      }
+      // verify the content of tx
+      if (!test_tx(*flatbuffers::GetRoot<protocol::Transaction>(tx.data()))) {
         return false;
       }
     }
     return true;
   });
 
+  // verify block.created (simple check)
   validator.addValidator([](const sumeragi::Block& block) -> bool {
     return block.created <= datetime::unixtime();
   });

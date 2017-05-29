@@ -15,21 +15,33 @@
  */
 
 #include <functional>
+#include <transaction_generated.h>
 
 namespace sumeragi { class Block; }
 
 namespace validator {
 namespace stateless {
 
-using validator_t = std::function<bool(sumeragi::Block)>;
+template <typename T>
+using validator_t = std::function<bool(const T&)>;
 
+template <typename T>
 class StatelessValidator {
 public:
-  void addValidator(const validator_t& validator);
-  bool test(const sumeragi::Block&);
+  void addValidator(const validator_t<T>& validator) {
+    validators_.push_back(validator);
+  }
+
+  bool test(const T& obj) {
+    bool res = true;
+    for (const auto& verify: validators_) {
+      res = res && verify(obj);
+    }
+    return res;
+  }
 
 private:
-  std::vector<validator_t> validators_;
+  std::vector<validator_t<T>> validators_;
 };
 
 // Set block dispatcher if validation succeeded.
