@@ -19,19 +19,31 @@
 #include <transaction_generated.h>
 #include "tx_generator.h"
 
-TEST(tx_generator_test, AccountAddAccount) {
+/*
+TEST(tx_generator_test, asset_id) {
+  // Use regexp
+  std::cout << generator::random_asset_id() << std::endl;
+}
+*/
 
-  ASSERT_NO_THROW({
-    flatbuffers::FlatBufferBuilder fbb;
-    auto actions = std::vector<flatbuffers::Offset<protocol::ActionWrapper>>{
-      generator::random_AccountAddAccount(fbb)
-    };
-    auto attachment = generator::random_attachment(fbb);
-    auto tx = generator::random_tx(fbb, actions, attachment);
-    std::cout << dump::toString(
-      *flatbuffers::GetRoot<protocol::Transaction>(tx.data())
-    ) << std::endl;
-  });
+#define DEF_TEST_CMD(CMD) \
+TEST(tx_generator_test, CMD) { \
+  ASSERT_NO_THROW({ \
+    flatbuffers::FlatBufferBuilder fbb; \
+    auto actions = std::vector<flatbuffers::Offset<protocol::ActionWrapper>>{ \
+      generator::random_ ## CMD(fbb) \
+    }; \
+    auto attachment = generator::random_attachment(fbb); \
+    auto tx = generator::random_tx(fbb, actions, attachment); \
+    flatbuffers::Verifier verifier(tx.data(), tx.size()); \
+    if (!verifier.VerifyBuffer<protocol::Transaction>()) { \
+      throw std::runtime_error("Failed to verify flatbuf."); \
+    } \
+    std::cout << dump::toString( \
+      *flatbuffers::GetRoot<protocol::Transaction>(tx.data()) \
+    ) << std::endl; \
+  }); \
 }
 
-//#define DEF_TEST_COMMAND
+DEF_TEST_CMD(AccountAddAccount)
+DEF_TEST_CMD(AssetCreate)

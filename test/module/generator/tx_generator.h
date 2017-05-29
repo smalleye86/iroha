@@ -26,46 +26,81 @@
 #include <crypto/base64.hpp>
 #include <crypto/signature.hpp>
 
-std::random_device seed_gen;
-std::mt19937 rnd_gen(seed_gen());
 // return random value of [min, max]
-template <typename T> T random_value(T min, T max) {
-  std::uniform_int_distribution<T> dist(min, max);
-  return dist(rnd_gen);
+inline int32_t random_value_32(int32_t min, int32_t max) {
+  assert(min <= max);
+  return rand() % (max - min) + min;
+  /*
+  std::mt19937 rnd_gen_32;
+  std::cout << min << ", " << max << std::endl;
+  assert(min <= max);
+  std::uniform_int_distribution<int32_t> dist(min, max);
+  return dist(rnd_gen_32);
+   */
 }
+
+//std::mt19937_64 rnd_gen_64(seed_gen());
+/*
+// return random value of [min, max]
+inline int random_value_64(int min, int max) {
+  // FIXME: doesn't work
+  std::cout << min << ", " << max << std::endl;
+  assert(min <= max);
+  std::uniform_int_distribution<int64_t> dist(min, max);
+  return dist(rnd_gen_64);
+}
+*/
 
 namespace generator {
 
 constexpr int MinQuorum = 1;
 constexpr int MaxQuorum = 32;
+constexpr size_t MaxStringSize = 1e9;
 
 inline char random_alphabet() {
-  return 'a' + random_value(0, 'z' - 'a' + 1);
+  const std::string buf = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const int size = buf.size();
+  return buf[random_value_32(0, size - 1)];
+}
+
+inline char random_alnum() {
+  const std::string buf = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const int size = buf.size();
+  return buf[random_value_32(0, size - 1)];
+}
+
+inline std::string random_string(size_t length, std::function<char()> const& char_gen) {
+  std::string ret;
+  for (size_t i = 0; i < length; i++) {
+    ret += char_gen();
+  }
+  return ret;
 }
 
 inline std::string random_alphabets(size_t length) {
-  std::string ret;
-  for (size_t i = 0; i < length; i++) {
-    ret += random_alphabet();
-  }
-  return ret;
+  assert(length <= MaxStringSize);
+  return random_string(length, random_alphabet);
+}
+
+inline std::string random_alnums(size_t length) {
+  return random_string(length, random_alnum);
 }
 
 inline std::vector<std::uint8_t> random_bytes(size_t length) {
   std::vector<uint8_t> ret;
   for (size_t i = 0; i < length; i++) {
-    ret.push_back(random_value(0, (1 << 8) - 1));
+    ret.push_back(random_value_32(0, (1 << 8) - 1));
   }
   return ret;
 }
 
 inline std::string random_sha3_256() {
-  auto raw_value = random_alphabets(random_value(1, 50));
+  auto raw_value = random_alphabets(random_value_32(1, 50));
   return hash::sha3_256_hex(raw_value);
 }
 
 inline std::string random_base64() {
-  auto raw_value = random_alphabets(random_value(1, 50));
+  auto raw_value = random_alphabets(random_value_32(1, 50));
   std::vector<unsigned char> value;
   for (auto e: raw_value) {
     value.push_back(e);
@@ -73,12 +108,18 @@ inline std::string random_base64() {
   return base64::encode(value);
 }
 
+inline std::string random_asset_id() {
+  return random_alnums(10) + "#"
+         + random_alnums(5) + "." + random_alnums(3) + "." + random_alnums(2);
+}
+
 inline uint64_t random_time() {
-  return random_value(0LL, 1LL << 63);
+//  return random_value_64(0LL, 1LL << 62);
+  return random_value_32(0LL, 1LL << 29);
 }
 
 inline uint32_t random_nonce() {
-  return random_value(0LL, 1LL << 63);
+  return random_value_32(0, 1 << 30);
 }
 
 inline std::vector<uint8_t> random_signature(signature::KeyPair const& key_pair) {
@@ -91,7 +132,8 @@ inline std::vector<uint8_t> random_signature(signature::KeyPair const& key_pair)
 }
 
 inline uint8_t random_quorum(int max = MaxQuorum) {
-  return random_value(MinQuorum, max);
+  assert(MinQuorum <= max);
+  return random_value_32(MinQuorum, max);
 }
 
 inline flatbuffers::Offset<protocol::Signature> random_signature(
@@ -130,6 +172,16 @@ inline flatbuffers::Offset<protocol::ActionWrapper> random_AccountAddAccount(
   );
   return protocol::CreateActionWrapper(
     fbb, protocol::Action::AccountAddAccount, act.Union()
+  );
+}
+
+inline flatbuffers::Offset<protocol::ActionWrapper> random_AssetCreate(
+  flatbuffers::FlatBufferBuilder &fbb) {
+  auto act = protocol::CreateAssetCreate(
+    fbb, fbb.CreateString(random_asset_id())
+  );
+  return protocol::CreateActionWrapper(
+    fbb, protocol::Action::AssetCreate, act.Union()
   );
 }
 
@@ -238,6 +290,17 @@ std::string toString(const protocol::Transaction& tx) {
       std::string res = "AccountAddAccount[\n";
       res += toString(*act->signatories(), "signatories", 2);
       res += "  quorum:" + std::to_string(act->quorum()) + "\n";
+      res += "]\n";
+      return res;
+    };
+
+  action_to_strings[protocol::Action::AssetCreate] =
+    [&](const void* action) -> std::string {
+      const protocol::AssetCreate* act =
+        static_cast<const protocol::AssetCreate*>(action);
+
+      std::string res = "AssetCreate[\n";
+      res += "  asset_id: " + act->asset_id()->str() + "\n";
       res += "]\n";
       return res;
     };
