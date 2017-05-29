@@ -55,16 +55,16 @@ public:
 private:
 
   enum BuildStatus: uint8_t {
-    initWithTxs    = 1 << 0,
-    initWithBlock  = 1 << 1,
-    withSignature  = 1 << 2,
-    blockFromTxs   = initWithTxs,
-    blockFromBlock = initWithBlock
-                     | withSignature,
-    commit         = initWithBlock,
+    initWithTxs       = 1 << 0,
+    initWithBlock     = 1 << 1,
+    withSignature     = 1 << 2,
+    completeFromTxs   = initWithTxs,
+    completeFromBlock = initWithBlock
+                        | withSignature,
+    commit            = initWithBlock,
   };
 
-  int buildStatus_;
+  int buildStatus_ = 0;
 
   // initWithTxs
   std::vector <std::vector<uint8_t>> txs_;

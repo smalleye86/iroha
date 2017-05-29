@@ -25,7 +25,7 @@ BlockBuilder::BlockBuilder() {}
 BlockBuilder& BlockBuilder::setTxs(const std::vector<std::vector<uint8_t>>& txs)
 {
   if (txs.size() >= MaxTxs)
-    throw std::runtime_error("");
+    throw std::runtime_error("overflow txs.size");
   txs_ = txs;
   buildStatus_ |= BuildStatus::initWithTxs;
   return *this;
@@ -40,9 +40,9 @@ BlockBuilder& BlockBuilder::setBlock(const Block& block)
 
 BlockBuilder& BlockBuilder::addSignature(const Signature& sig) {
   if (buildStatus_ & initWithBlock == 0)
-    throw std::runtime_error("");
+    throw std::runtime_error("not initialized with setBlock()");
   if (buildStatus_ & BuildStatus::withSignature)
-    throw std::runtime_error("");
+    throw std::runtime_error("duplicate addSignature()");
   peer_sigs_.push_back(sig);
   return *this;
 }
@@ -50,19 +50,19 @@ BlockBuilder& BlockBuilder::addSignature(const Signature& sig) {
 Block BlockBuilder::build() {
 
   if (buildStatus_ & BuildStatus::initWithTxs) {
-    if (buildStatus_ != BuildStatus::blockFromTxs) {
-      throw std::runtime_error("");
+    if (buildStatus_ & BuildStatus::completeFromTxs != buildStatus_) {
+      throw std::runtime_error("not completed init with txs");
     }
     return Block {txs_, {}, datetime::unixtime(), BlockState::uncommitted};
   }
   else if (buildStatus_ & BuildStatus::initWithBlock) {
-    if (buildStatus_ != BuildStatus::blockFromBlock) {
-      throw std::runtime_error("");
+    if (buildStatus_ & BuildStatus::completeFromBlock != buildStatus_) {
+      throw std::runtime_error("not completed init with block");
     }
     return block_;
   }
   else {
-    throw std::runtime_error("");
+    throw std::runtime_error("not completed any build");
   }
 }
 
