@@ -16,45 +16,66 @@
  */
 
 #include <gtest/gtest.h>
-//#include <../test/generator/tx_generator.h>
 #include <validator/stateless_validator.hpp>
 #include <consensus/block_builder.hpp>
 #include <flatbuffers/flatbuffers.h>
+#include <actions_generated.h>
+#include <transaction_generated.h>
+#include "../generator/tx_generator.h"
 
 using sumeragi::Block;
 using sumeragi::BlockBuilder;
 
-TEST(stateless_validator_test, failed_to_dispatch) {
+TEST(stateless_validator_test, random_tx) {
 
+  flatbuffers::FlatBufferBuilder fbb;
+  auto actions = std::vector<flatbuffers::Offset<protocol::ActionWrapper>> {
+    generator::random_AccountAddAccount(fbb)
+  };
+  auto attachment = generator::random_attachment(fbb);
   std::vector<std::vector<uint8_t>> txs {
-    //tx
+    generator::random_tx(fbb, actions, attachment)
   };
 
   auto block = BlockBuilder()
     .setTxs(txs)
     .build();
 
-  validator::stateless::test(block);
+  validator::stateless::receive([](const Block& block) {
+    std::cout << "receive\n";
+    for (auto const& tx: block.txs) {
+      std::cout << dump::toString(*flatbuffers::GetRoot<protocol::Transaction>(tx.data())) << std::endl;
+    }
+
+    auto curr_time = datetime::unixtime();
+    ASSERT_TRUE(curr_time - 2 <= block.created);
+    ASSERT_TRUE(block.created <= curr_time);
+    ASSERT_TRUE(block.state == sumeragi::BlockState::uncommitted);
+    ASSERT_TRUE(block.peer_sigs.empty());
+  });
+
+  ASSERT_TRUE(validator::stateless::test(block));
 }
 
-TEST(stateless_validator_test, tx) {
-/*
-auto creator = tx_builder::CreateSignature(
-  "pubkey",
-  "signature"
-);
 
-auto action = tx_builder::CreateAction(
-  protocol::Action::AccountAddAccount
-);
+TEST(stateless_validator_test, tx_string_broken) {
 
-auto actions = std::vector<std::vector<uint8_t>> {
-  action
-};
+  flatbuffers::FlatBufferBuilder fbb;
+  auto actions = std::vector<flatbuffers::Offset<protocol::ActionWrapper>> {
+    generator::random_AssetCreate(fbb)
+  };
+  auto attachment = generator::random_attachment(fbb);
+  std::vector<std::vector<uint8_t>> txs {
+    generator::random_tx(fbb, actions, attachment)
+  };
 
-auto tx = tx_buiilder::TxBuilder()
-  .setCreator(creator)
-  .setActions(actions)
-  .build();
-*/
+  //auto root = flatbuffers::GetRoot<protocol::Transaction>(txs[0].data());
+
+  auto block = BlockBuilder()
+    .setTxs(txs)
+    .build();
+
+  validator::stateless::receive([](const Block& block) {});
+
+  ASSERT_TRUE(validator::stateless::test(block));
 }
