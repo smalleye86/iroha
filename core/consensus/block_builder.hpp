@@ -30,6 +30,8 @@ namespace sumeragi {
 struct Signature {
   std::vector<uint8_t> publicKey;
   std::vector<uint8_t> signature;
+
+  flatbuffers::Offset<protocol::Signature> packOffset(flatbuffers::FlatBufferBuilder& fbb) const;
 };
 
 enum class BlockState {

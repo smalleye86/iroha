@@ -19,20 +19,50 @@
 #include "block_builder.hpp"
 #include <stdexcept>
 
+#include <flatbuffers/flatbuffers.h>
 #include <main_generated.h> // pack()
 
 namespace sumeragi {
 
+flatbuffers::Offset<protocol::Signature> Signature::packOffset(
+  flatbuffers::FlatBufferBuilder &fbb) const {
+  return protocol::CreateSignature(
+    fbb, fbb.CreateVector(publicKey), fbb.CreateVector(signature)
+  );
+}
+
 std::vector<uint8_t> Block::pack() const {
   flatbuffers::FlatBufferBuilder fbb;
 
-  /*
+  // Create tx wrapper offset vector
+  std::vector<flatbuffers::Offset<protocol::TransactionWrapper>> txs_o;
+  for (const auto& tx: txs) {
+    auto root = flatbuffers::GetRoot<protocol::TransactionWrapper>(tx.data());
+    std::vector<uint8_t> txbuf(root->tx()->begin(), root->tx()->end());
+    txs_o.push_back(
+      protocol::CreateTransactionWrapper(fbb, fbb.CreateVector(txbuf))
+    );
+  }
+
+  // Create peer sigs offset vector
+  std::vector<flatbuffers::Offset<protocol::Signature>> peer_sigs_o;
+  for (const auto& sig: peer_sigs) {
+    peer_sigs_o.push_back(sig.packOffset(fbb));
+  }
+
   auto block_o = protocol::CreateBlock(
-    fbb,
+    fbb, fbb.CreateVector(txs_o),
+    fbb.CreateVector(peer_sigs_o),
+    /* prev_hash */ nullptr,
+    /* length */ 0,
+    /* merkle_root */ nullptr,
+    /* height */ 0,
+    datetime::unixtime(),
+    protocol::BlockState::UNCOMMITTED
   );
 
-  fbb.Finish(blockoffset);
-  */
+  fbb.Finish(block_o);
+
   auto buf = fbb.GetBufferPointer();
   return {buf, buf + fbb.GetSize()};
 }
@@ -92,4 +122,4 @@ Block BlockBuilder::buildCommit() {
   }
 }
 
-};
+}  // namespace sumeragi
