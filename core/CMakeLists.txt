@@ -1,2 +1,4 @@
+add_subdirectory(consensus)
 add_subdirectory(infra)
 add_subdirectory(membership_service)
+add_subdirectory(utils)

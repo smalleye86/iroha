@@ -63,6 +63,28 @@ set_target_properties(ed25519 PROPERTIES
         )
 add_dependencies(ed25519 mizukisonoko_ed25519)
 
+#########################
+#         json          #
+#########################
+ExternalProject_Add(nlohmann_json
+        GIT_REPOSITORY    "https://github.com/nlohmann/json.git"
+        BUILD_COMMAND     "" # remove build step, header only lib
+        CONFIGURE_COMMAND "" # remove configure step
+        INSTALL_COMMAND   "" # remove install step
+        TEST_COMMAND      "" # remove test step
+        UPDATE_COMMAND    "" # remove update step
+        )
+ExternalProject_Get_Property(nlohmann_json source_dir)
+set(json_SOURCE_DIR "${source_dir}")
+
+# since it is header only, we changed STATIC to INTERFACE below
+add_library(json INTERFACE IMPORTED)
+file(MAKE_DIRECTORY ${json_SOURCE_DIR}/src)
+set_target_properties(json PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES ${json_SOURCE_DIR}/src
+        )
+add_dependencies(json nlohmann_json)
+
 
 ##########################
 #         gtest          #
