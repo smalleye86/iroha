@@ -3,7 +3,7 @@ include "primitives.fbs";
 namespace protocol;
 
 table AssetCreate {
-  asset:  string  (required);
+  asset: Asset (required);
 }
 
 table AssetDelete {
@@ -11,15 +11,15 @@ table AssetDelete {
 }
 
 table AssetMove {
-  source_asset: string  (required);
-  destination_asset:  string  (required);
+  target_asset: string  (required);
+  destination_domain:  string  (required);
 }
 
 table AccountCreate {
   username: string  (required);
   signatories:  [Signature] (required);
   quorum: ubyte;
-  domain: string;
+  target_domain: string;
 }
 
 table AccountDelete {
@@ -27,15 +27,15 @@ table AccountDelete {
 }
 
 table AccountRegister {
-  target_account: string  (required);
-  destination_account:  string  (required);
-  permission: [ubyte];
+  target_account:      string  (required);
+  target_domain:       string;
+  permission:          [ubyte];
 }
 
 table AccountUnregister {
   target_account: string  (required);
+  target_domain;  string;
 }
-
 
 table DomainCreate {
   domain: string  (required);
@@ -53,7 +53,7 @@ table DomainMove {
 
 table DomainSetPermission {
   domain: string  (required);
-  account:  string  (required);
+  target_account:  string  (required);
   permission: [ubyte] (required);
 }
 
