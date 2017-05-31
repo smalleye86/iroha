@@ -19,7 +19,23 @@
 #include "block_builder.hpp"
 #include <stdexcept>
 
+#include <main_generated.h> // pack()
+
 namespace sumeragi {
+
+std::vector<uint8_t> Block::pack() const {
+  flatbuffers::FlatBufferBuilder fbb;
+
+  /*
+  auto block_o = protocol::CreateBlock(
+    fbb,
+  );
+
+  fbb.Finish(blockoffset);
+  */
+  auto buf = fbb.GetBufferPointer();
+  return {buf, buf + fbb.GetSize()};
+}
 
 BlockBuilder::BlockBuilder() {}
 BlockBuilder& BlockBuilder::setTxs(const std::vector<std::vector<uint8_t>>& txs)

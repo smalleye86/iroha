@@ -20,6 +20,7 @@
 
 #include <utils/datetime.hpp>
 #include <vector>
+#include <main_generated.h>
 
 // Document's required size = 2^32 - 1
 constexpr int MaxTxs = 2 * 1e7; // (1LL << 32) - 1;
@@ -41,6 +42,8 @@ struct Block {
   std::vector <Signature> peer_sigs;
   uint64_t created; // timestamp
   BlockState state;
+
+  std::vector<uint8_t> pack() const;
 };
 
 class BlockBuilder {
