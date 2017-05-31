@@ -53,9 +53,9 @@ std::vector<uint8_t> Block::pack() const {
   auto block_o = protocol::CreateBlock(
     fbb, fbb.CreateVector(txs_o),
     fbb.CreateVector(peer_sigs_o),
-    /* prev_hash */ nullptr,
+    /* prev_hash */ 0,
     /* length */ 0,
-    /* merkle_root */ nullptr,
+    /* merkle_root */ 0,
     /* height */ 0,
     datetime::unixtime(),
     protocol::BlockState::UNCOMMITTED
