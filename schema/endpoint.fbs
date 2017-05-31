@@ -1,5 +1,4 @@
 include "main.fbs";
-include "query.fbs";
 
 namespace protocol;
 
@@ -51,9 +50,9 @@ rpc_service Sumeragi {
   Consensus(Block):   SumeragiResponse (streaming: "none");
 }
 
-rpc_service DataStore {
-  Query(QueryRequestWrapper): QueryRequestWrapper (streaming: "none");
-}
+//rpc_service DataStore {
+//  Query(QueryRequestWrapper): QueryRequestWrapper (streaming: "none");
+//}
 
 rpc_service Hijiri {
   // Kagami means ping
