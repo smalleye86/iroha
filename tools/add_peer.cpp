@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
     std::cout << "toPeerIp:"     << argv[4] << std::endl;
 
     const auto peer = ::peer::Node( argv[2],  argv[1], argv[3]);
-    ::peer::transaction::isssue::add( argv[4], peer);
+    ::peer::transaction::issue::add( argv[4], peer);
 
     std::cout << "== Done!! ==" << std::endl;
     return 0;
