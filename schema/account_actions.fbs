@@ -14,7 +14,7 @@ table SignatoriesUnregister {
 
 table AccountSetQuorum {
   target_account: string  (required);
-  quorum: ubyte (required);
+  quorum: ubyte;
 }
 
 table AccountDelegate {
@@ -31,4 +31,7 @@ union AccountAction{
 
   AccountDelegate,
   AccountUndelegate
+}
+table AccountActionWrapper {
+  action: AccountAction;
 }

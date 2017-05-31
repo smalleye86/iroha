@@ -26,7 +26,7 @@ compile_fbs_to_cpp(endpoint.fbs)
 compile_fbs_to_cpp(main.fbs)
 compile_fbs_to_cpp(primitives.fbs)
 compile_fbs_to_cpp(transaction.fbs)
-compile_fbs_to_cpp(query.fbs)
+#compile_fbs_to_cpp(query.fbs)
 
 add_library(endpoint_fbs STATIC
     ${IROHA_SCHEMA_DIR}/endpoint.grpc.fb.cc

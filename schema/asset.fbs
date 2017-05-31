@@ -4,7 +4,7 @@ namespace protocol;
 
 table Currency {
   amount: [ubyte] (required);
-  precision:  ubyte (requried);
+  precision:  ubyte;
 }
 
 // [WIP] ComplexAsset

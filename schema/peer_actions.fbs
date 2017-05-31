@@ -20,17 +20,17 @@ table PeerRemove {
 
 table PeerSetTrust {
   target_peer:  string  (required);
-  trust:  double  (required);
+  trust:  double;
 }
 
 table PeerChangeTrust {
   target_peer:  string  (required);
-  turst:  double  (required);
+  turst:  double;
 }
 
 table PeerSetState {
-  target_peer:  string  required);
-  state:  bool  (required);
+  target_peer:  string  (required);
+  state:  bool;
 }
 
 union PeerAction{
@@ -39,4 +39,7 @@ union PeerAction{
   PeerSetTrust,
   PeerChangeTrust,
   PeerSetState
+}
+table PeerActionWrapper {
+  action: PeerAction;
 }

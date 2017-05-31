@@ -1,4 +1,3 @@
-
 include "asset_actions.fbs";
 include "account_actions.fbs";
 include "domain_actions.fbs";
@@ -6,11 +5,12 @@ include "peer_actions.fbs";
 
 namespace protocol;
 
+
 union Action {
-  AssetAction,
-  AccountAction,
-  DomainAction,
-  PeerAction
+  AssetActionWrapper,
+  AccountActionWrapper,
+  DomainActionWrapper,
+  PeerActionWrapper
 }
 
 // union vector is supported in C++ only.

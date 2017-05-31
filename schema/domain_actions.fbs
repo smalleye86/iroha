@@ -22,6 +22,10 @@ table AccountCreate {
   domain: string;
 }
 
+table AccountDelete {
+  target_account:  string  (required);
+}
+
 table AccountRegister {
   target_account: string  (required);
   destination_account:  string  (required);
@@ -33,7 +37,7 @@ table AccountUnregister {
 }
 
 
-table DomainCraete {
+table DomainCreate {
   domain: string  (required);
   root_account: string  (required);
 }
@@ -56,7 +60,7 @@ table DomainSetPermission {
 // [WIP] DomainAddNotify
 table DomainSetNotify {
   target_domain:  string  (required);
-  is_notify:  bool; (required);
+  is_notify:  bool;
 }
 
 union DomainAction{
@@ -74,4 +78,8 @@ union DomainAction{
   DomainMove,
   DomainSetPermission,
   DomainSetNotify
+}
+
+table DomainActionWrapper {
+  action: DomainAction;
 }
