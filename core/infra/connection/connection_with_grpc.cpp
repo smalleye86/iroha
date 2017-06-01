@@ -55,6 +55,7 @@ class SumeragiServer {
     fbbResponse.Clear();
 
     // UnPack to sumeragi::Block
+    
 
     // Dispatch to stateless validator
 
@@ -107,39 +108,50 @@ namespace with_sumeragi {
  * @param block - block to consensus.
  * @param index - validating peer's index.
  */
-void unicast(const sumeragi::Block& block, size_t index) {
+void unicast(const sumeragi::Block& block, ::peer::Nodes::const_iterator iter) {
 
-  auto peers = ::peer::service::getActivePeerList();
+  if (::peer::service::isExistIP((*iter)->ip)) {
+    SumeragiClient client((*iter)->ip);
 
-  if (::peer::service::isExistIP(peers[index]->ip)) {
-    SumeragiClient client(peers[index]->ip);
     flatbuffers::BufferRef<protocol::SumeragiResponse> response;
-    client.Consensus(block, &response);
+    auto stat = client.Consensus(block, &response);
 
-    if (response.GetRoot()->code() == protocol::ResponseCode::FAIL) {
-      std::cout << "errcode: " << protocol::EnumNameResponseCode(response.GetRoot()->code())
-                << "message: " << response.GetRoot()->message() << std::endl;
+    // current implementation doesn't require response.
+
+    if (!stat.ok()) {
+      std::cout << "{error_code: " << stat.error_code() << ", "
+                << "error_message: " << stat.error_message() << ", "
+                << "error_details: " << stat.error_details() << "}\n";
     }
   } else {
-    std::cout << "IP doesn't exist." << std::endl;
+    std::cout << "IP: " << (*iter)->ip << " doesn't exist." << std::endl;
   }
 }
 
 /**
  * multicasts block to [beginIndex, endIndex) peers.
  * @param block - block to consensus.
- * @param beginIndex - validating peer's index except leader (usually = 1)
- * @param endIndex - validatinng peer's tail index + 1
+ * @param begin - validating peer's iterator except leader (usually next to begin())
+ * @param end - validating peer's tail + 1 iterator
  */
-void multicast(const sumeragi::Block& block, size_t beginIndex, size_t endIndex) {
-
+void multicast(const sumeragi::Block& block,
+               ::peer::Nodes::const_iterator begin,
+               ::peer::Nodes::const_iterator end) {
+  for (auto iter = begin; iter != end; iter++) {
+    unicast(block, iter);
+  }
 }
 
 /**
- * commits block to all peers.
+ * commits block to all peers except sender
  */
-void commit() {
-
+void commit(const sumeragi::Block& block, ::peer::Nodes::const_iterator sender) {
+  auto peers = ::peer::service::getActivePeerList();
+  for (auto iter = peers.begin(); iter != peers.end(); iter++) {
+    if (sender != iter) {
+      unicast(block, iter);
+    }
+  }
 }
 
 } // namespace with_sumeragi
@@ -157,7 +169,7 @@ public:
    * @param tx [description]
    * @param responseRef [description]
    *
-   * @return VoidHandler. Returns exception if error occurs.
+   * @return grpc::Status
    */
   grpc::Status Torii(const flatbuffers::BufferRef<protocol::Transaction> &request,
                      flatbuffers::BufferRef<protocol::SumeragiResponse> *response) const {
