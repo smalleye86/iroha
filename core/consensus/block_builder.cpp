@@ -31,9 +31,7 @@ flatbuffers::Offset<protocol::Signature> Signature::packOffset(
   );
 }
 
-std::vector<uint8_t> Block::pack() const {
-  flatbuffers::FlatBufferBuilder fbb;
-
+flatbuffers::Offset<protocol::Block> Block::packOffset(flatbuffers::FlatBufferBuilder& fbb) const {
   // Create tx wrapper offset vector
   std::vector<flatbuffers::Offset<protocol::TransactionWrapper>> txs_o;
   for (const auto& tx: txs) {
@@ -50,7 +48,7 @@ std::vector<uint8_t> Block::pack() const {
     peer_sigs_o.push_back(sig.packOffset(fbb));
   }
 
-  auto block_o = protocol::CreateBlock(
+  return protocol::CreateBlock(
     fbb, fbb.CreateVector(txs_o),
     fbb.CreateVector(peer_sigs_o),
     /* prev_hash */ 0,
@@ -60,11 +58,6 @@ std::vector<uint8_t> Block::pack() const {
     datetime::unixtime(),
     protocol::BlockState::UNCOMMITTED
   );
-
-  fbb.Finish(block_o);
-
-  auto buf = fbb.GetBufferPointer();
-  return {buf, buf + fbb.GetSize()};
 }
 
 BlockBuilder::BlockBuilder() {}

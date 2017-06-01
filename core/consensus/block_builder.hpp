@@ -40,12 +40,12 @@ enum class BlockState {
 };
 
 struct Block {
-  std::vector <std::vector<uint8_t>> txs;
-  std::vector <Signature> peer_sigs;
+  std::vector<std::vector<uint8_t>> txs;
+  std::vector<Signature> peer_sigs;
   uint64_t created; // timestamp
   BlockState state;
 
-  std::vector<uint8_t> pack() const;
+  flatbuffers::Offset<protocol::Block> packOffset(flatbuffers::FlatBufferBuilder& fbb) const;
 };
 
 class BlockBuilder {
