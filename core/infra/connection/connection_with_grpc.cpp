@@ -17,16 +17,54 @@
 
 #include <grpc++/grpc++.h>
 #include <consensus/block_builder.hpp> // sumeragi::Block
-#include <membership_service/peer_service.hpp>
+#include <infra/config/iroha_config_with_json.hpp> // createChannel()
+#include <membership_service/peer_service.hpp> // ::peer::service::getActivePeerList()
 #include <endpoint_generated.h>
-#include <endpoint.grpc.fb.h>
+#include <endpoint.grpc.fb.h> // protocol::Sumeragi
 
 namespace connection {
 
-enum ResponseType {
+enum class ResponseType {
   RESPONSE_OK,
   RESPONSE_INVALID_SIG,  // wrong signature
   RESPONSE_ERRCONN,      // connection error
+};
+
+/**
+ * helper function to create channel
+ */
+static std::shared_ptr<grpc::Channel> createChannel(const std::string& serverIp/*, GrpcPortType portType*/) {
+  return grpc::CreateChannel(
+    serverIp + ":" +
+    std::to_string(config::IrohaConfigManager::getInstance()
+                     .getGrpcPortNumber(50051)),
+    grpc::InsecureChannelCredentials()
+  );
+}
+
+/**
+ * SumeragiServer
+ * @brief RPC server for connecting with other sumeragi RPC server.
+ */
+class SumeragiServer {
+  virtual grpc::Status Consensus(
+    grpc::ClientContext* context,
+    const flatbuffers::BufferRef<protocol::Block>& request,
+    flatbuffers::BufferRef<protocol::SumeragiResponse>* response) {
+
+    fbbResponse.Clear();
+
+    // UnPack to sumeragi::Block
+
+    // Dispatch to stateless validator
+
+    // Returns validation
+
+    return grpc::Status::OK;
+  }
+
+private:
+  flatbuffers::FlatBufferBuilder fbbResponse;
 };
 
 /**
@@ -35,8 +73,8 @@ enum ResponseType {
  */
 class SumeragiClient {
 public:
-  explicit SumeragiClient(std::shared_ptr<Channel> channel)
-    : stub_(Sumeragi::NewStub(channel)) {}
+  explicit SumeragiClient(const std::string& serverIp)
+    : stub_(protocol::Sumeragi::NewStub(createChannel(serverIp))) {}
 
   /**
    * Consensus
@@ -47,34 +85,19 @@ public:
    *
    * @return grpc::Status
    */
-  grpc::Status Consensus(const Block &block_,
-                 flatbuffers::BufferRef<Response> *response) const {
+  grpc::Status Consensus(const sumeragi::Block &block,
+                         flatbuffers::BufferRef<protocol::SumeragiResponse> *response) const {
     grpc::ClientContext context;
-    auto block_buf = sumeragi::BlockBuilder(block_).build();
-    flatbuffers::
-    auto request = flatbuffer_service::CreateBufferRef<sumeragi::Block>(block);
+    flatbuffers::FlatBufferBuilder fbb;
+    auto block_o = block.packOffset(fbb);
+    flatbuffers::BufferRef<protocol::Block> request(
+      fbb.GetBufferPointer(), fbb.GetSize()
+    );
     return stub_->Consensus(&context, request, response);
   }
 
-  /**
-   * Torii
-   * @brief Cient for sending tx to sumeragi. This method is for peer service.
-   * @details peer service -> interface -> [RPC Cient] -> RPC Server -> other sumeragi
-   *
-   * @param tx [description]
-   * @param responseRef [description]
-   *
-   * @return VoidHandler. Returns exception if error occurs.
-   */
-  grpc::Status Torii(const ::protocol::Transaction &tx,
-                    flatbuffers::BufferRef<Response> *responseRef) const {
-    ClientContext context;
-    auto request = flatbuffer_service::CreateBufferRef<::iroha::Transaction>(tx);
-    return stub_->Torii(&clientContext, request, response);
-  }
-
 private:
-  std::unique_ptr<Sumeragi::Stub> stub_;
+  std::unique_ptr<protocol::Sumeragi::Stub> stub_;
 };
 
 namespace with_sumeragi {
@@ -85,10 +108,11 @@ namespace with_sumeragi {
  * @param index - validating peer's index.
  */
 void unicast(const sumeragi::Block& block, size_t index) {
-  auto peers = ::peer::service::getActivePeerList();
-  if (::peer::service::isExistIP(peers[index]->ip)) {
 
-    SumeragiClient client;
+  auto peers = ::peer::service::getActivePeerList();
+
+  if (::peer::service::isExistIP(peers[index]->ip)) {
+    SumeragiClient client(peers[index]->ip);
     flatbuffers::BufferRef<protocol::SumeragiResponse> response;
     client.Consensus(block, &response);
 
@@ -119,4 +143,31 @@ void commit() {
 }
 
 } // namespace with_sumeragi
+
+class PeerServiceClient {
+public:
+  PeerServiceClient(const std::string& serverIp)
+    : stub_(protocol::Sumeragi::NewStub(createChannel(serverIp))) {}
+
+  /**
+   * Torii
+   * @brief Cient for sending tx to sumeragi. This method is for peer service.
+   * @details peer service -> interface -> [RPC Cient] -> RPC Server -> other sumeragi
+   *
+   * @param tx [description]
+   * @param responseRef [description]
+   *
+   * @return VoidHandler. Returns exception if error occurs.
+   */
+  grpc::Status Torii(const flatbuffers::BufferRef<protocol::Transaction> &request,
+                     flatbuffers::BufferRef<protocol::SumeragiResponse> *response) const {
+    grpc::ClientContext context;
+    return stub_->Torii(&context, request, response);
+  }
+
+private:
+  std::unique_ptr<protocol::Sumeragi::Stub> stub_;
+};
+
+
 } // namespace connection
