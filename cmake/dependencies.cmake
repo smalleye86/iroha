@@ -1,8 +1,8 @@
 include(ExternalProject)
 set(EP_PREFIX "${PROJECT_SOURCE_DIR}/external")
 set_directory_properties(PROPERTIES
-  EP_PREFIX ${EP_PREFIX}
-)
+        EP_PREFIX ${EP_PREFIX}
+        )
 
 # Project dependencies.
 find_package(Threads REQUIRED)
@@ -12,7 +12,7 @@ find_package(Threads REQUIRED)
 ###########################
 find_package(LibXslt QUIET)
 if (NOT LIBXSLT_XSLTPROC_EXECUTABLE)
-  message(FATAL_ERROR "xsltproc not found")
+    message(FATAL_ERROR "xsltproc not found")
 endif ()
 
 ExternalProject_Add(gvanas_keccak
@@ -149,7 +149,6 @@ if(BENCHMARKING)
   add_dependencies(benchmark google_benchmark)
 endif(BENCHMARKING)
 
-
 ###############################
 #         flatbuffers         #
 ###############################
@@ -185,7 +184,6 @@ set_target_properties(flatbuffers PROPERTIES
   IMPORTED_LOCATION ${flatbuffers_LIBRARIES}
   )
 add_dependencies(flatbuffers google_flatbuffers flatc)
-
 
 
 #############################

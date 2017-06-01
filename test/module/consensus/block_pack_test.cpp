@@ -15,22 +15,11 @@
  * limitations under the License.
  */
 
-#ifndef __TIME_HPP_
-#define __TIME_HPP_
+#include <gtest/gtest.h>
+#include <consensus/block_builder.hpp>
 
-#include <cstdint>
-#include <string>
+using namespace sumeragi;
 
-namespace datetime {
+TEST(block_builder_test, pack_unpack) {
 
-std::uint64_t unixtime();
-
-std::string unixtime_str();
-
-std::string date_str();
-
-std::string unixtime2date(std::int64_t unixtime);
-
-};  // namespace datetime
-
-#endif
+}
