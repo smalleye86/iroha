@@ -81,9 +81,7 @@ public:
 
   /**
    * Communicate
-   * @detail communicates with other nodes.
-   *         sumeragi -> interface -> [RPC Client] -> RPC Server -> stateless-validation -> sumeragi
-   *
+   * @detail sumeragi -> interface -> [RPC Client] -> RPC Server -> stateless-validation -> sumeragi
    * @param block_ - block to consensus
    * @param response - to return SumeragiServer response
    *
@@ -117,14 +115,13 @@ void unicast(const sumeragi::Block& block, ::peer::Nodes::const_iterator iter) {
     SumeragiClient client((*iter)->ip);
 
     flatbuffers::BufferRef<protocol::SumeragiResponse> response;
-    auto stat = client.Consensus(block, &response);
+    auto stat = client.Communicate(block, &response);
 
     // current implementation doesn't require response.
 
     if (!stat.ok()) {
       std::cout << "{error_code: " << stat.error_code() << ", "
-                << "error_message: " << stat.error_message() << ", "
-                << "error_details: " << stat.error_details() << "}\n";
+                << "error_message: " << stat.error_message() << "}\n";
     }
   } else {
     std::cout << "IP: " << (*iter)->ip << " doesn't exist." << std::endl;
@@ -162,7 +159,7 @@ void commit(const sumeragi::Block& block, ::peer::Nodes::const_iterator sender) 
 class PeerServiceClient {
 public:
   PeerServiceClient(const std::string& serverIp)
-    : stub_(protocol::Sumeragi::NewStub(createChannel(serverIp))) {}
+    : stub_(protocol::ClientService::NewStub(createChannel(serverIp))) {}
 
   /**
    * Torii
@@ -181,7 +178,7 @@ public:
   }
 
 private:
-  std::unique_ptr<protocol::Sumeragi::Stub> stub_;
+  std::unique_ptr<protocol::ClientService::Stub> stub_;
 };
 
 

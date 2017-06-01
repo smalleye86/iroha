@@ -44,7 +44,7 @@ table TxRequest {
 
 rpc_service Sumeragi {
   // Used by sending block in consensus.
-  Consensus(Block):   SumeragiResponse (streaming: "none");
+  Communicate(Block): SumeragiResponse (streaming: "none");
 }
 
 rpc_service ClientService {
