@@ -44,10 +44,12 @@ static std::shared_ptr<grpc::Channel> createChannel(const std::string& serverIp/
 
 /**
  * SumeragiServer
- * @brief RPC server for connecting with other sumeragi RPC server.
- */
+ * @brief RPC server.
+ * @details UnPacks flatbuf and dispatches it to stateless-validation.
+ *          sumeragi -> interface -> RPC Client -> [RPC Server] -> stateless-validation -> sumeragi
+*/
 class SumeragiServer {
-  virtual grpc::Status Consensus(
+  virtual grpc::Status Communicate(
     grpc::ClientContext* context,
     const flatbuffers::BufferRef<protocol::Block>& request,
     flatbuffers::BufferRef<protocol::SumeragiResponse>* response) {
@@ -55,11 +57,11 @@ class SumeragiServer {
     fbbResponse.Clear();
 
     // UnPack to sumeragi::Block
-    
 
     // Dispatch to stateless validator
 
-    // Returns validation
+    // Returns signature (if needed)
+    (void) response; // current sumeragi alg doesn't require this signature.
 
     return grpc::Status::OK;
   }
@@ -70,7 +72,7 @@ private:
 
 /**
  * SumeragiClient
- * @brief RPC client for connecting with other sumeragi RPC server.
+ * @brief RPC client connects with other RPC server.
  */
 class SumeragiClient {
 public:
@@ -78,23 +80,24 @@ public:
     : stub_(protocol::Sumeragi::NewStub(createChannel(serverIp))) {}
 
   /**
-   * Consensus
-   * @detail sumeragi -> interface -> [RPC Client] -> RPC Server -> other sumeragi
+   * Communicate
+   * @detail communicates with other nodes.
+   *         sumeragi -> interface -> [RPC Client] -> RPC Server -> stateless-validation -> sumeragi
    *
    * @param block_ - block to consensus
    * @param response - to return SumeragiServer response
    *
    * @return grpc::Status
    */
-  grpc::Status Consensus(const sumeragi::Block &block,
-                         flatbuffers::BufferRef<protocol::SumeragiResponse> *response) const {
+  grpc::Status Communicate(const sumeragi::Block &block,
+                           flatbuffers::BufferRef<protocol::SumeragiResponse> *response) const {
     grpc::ClientContext context;
     flatbuffers::FlatBufferBuilder fbb;
     auto block_o = block.packOffset(fbb);
     flatbuffers::BufferRef<protocol::Block> request(
       fbb.GetBufferPointer(), fbb.GetSize()
     );
-    return stub_->Consensus(&context, request, response);
+    return stub_->Communicate(&context, request, response);
   }
 
 private:
