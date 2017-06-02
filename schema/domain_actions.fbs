@@ -1,4 +1,5 @@
 include "primitives.fbs";
+include "asset.fbs";
 
 namespace protocol;
 
@@ -6,13 +7,13 @@ table AssetCreate {
   asset: Asset (required);
 }
 
-table AssetDelete {
-  target_asset:  string  (required);
+table Delete {
+  target: string  (required);
 }
 
-table AssetMove {
-  target_asset: string  (required);
-  destination_domain:  string  (required);
+table Move {
+  source: string  (required);
+  destination:  string  (required);
 }
 
 table AccountCreate {
@@ -34,21 +35,12 @@ table AccountRegister {
 
 table AccountUnregister {
   target_account: string  (required);
-  target_domain;  string;
+  target_domain:  string;
 }
 
 table DomainCreate {
   domain: string  (required);
   root_account: string  (required);
-}
-
-table DomainDelete {
-  target_domain:  string  (required);
-}
-
-table DomainMove {
-  source_domain:  string  (required);
-  destination_domian: string  (required);
 }
 
 table DomainSetPermission {
@@ -65,17 +57,14 @@ table DomainSetNotify {
 
 union DomainAction{
   AssetCreate,
-  AssetDelete,
-  AssetMove,
+  DomainCreate,
+  Delete,
+  Move,
 
-  AccountCreate,
   AccountDelete,
   AccountRegister,
   AccountUnregister,
 
-  DomainCreate,
-  DomainDelete,
-  DomainMove,
   DomainSetPermission,
   DomainSetNotify
 }

@@ -3,9 +3,13 @@ include "primitives.fbs";
 
 namespace protocol;
 
+table SignatureWithState{
+    signature: Signature;
+    state:     Status;
+}
 table Transaction {
   creator: Signature (required);
-  sigs:    [Signature];
+  sigs:    [SignatureWithState];
   created: ulong;   // 64 bit(8 bytes)
   nonce:   uint;    // 32 bit(4 bytes)
 
