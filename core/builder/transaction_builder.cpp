@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 #include <iostream>
+#include "transaction_builder.hpp"
 
 namespace builder{
 

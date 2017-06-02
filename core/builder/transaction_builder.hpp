@@ -19,7 +19,7 @@ limitations under the License.
 #include <transaction_generated.h>
 #include <primitives_generated.h>
 
-#include "primitive.hpp"
+#include "primitive_builder.hpp"
 #include <vector>
 
 namespace builder{
