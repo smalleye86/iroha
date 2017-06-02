@@ -3,6 +3,8 @@ include "primitives.fbs";
 
 namespace protocol;
 
+enum Status: ubyte { Reject, Approve, Pending}
+
 table SignatureWithState{
     signature: Signature;
     state:     Status;
