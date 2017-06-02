@@ -1,3 +1,4 @@
+
 /*
  * Copyright Soramitsu Co., Ltd. 2016 All Rights Reserved.
  * http://soramitsu.co.jp
@@ -20,7 +21,7 @@ namespace exception {
 
 // Base Exception
 IrohaException::IrohaException(const std::string &message)
-    : message_(message) {}
+  : message_(message) {}
 
 IrohaException::~IrohaException() {}
 
@@ -30,57 +31,57 @@ const char *IrohaException::what() const throw() { return message_.c_str(); }
 std::string IrohaException::message() const { return message_.c_str(); }
 
 NoError::NoError(const std::string &message)
-    : IrohaException("<<NO_ERROR>> " + message) {
+  : IrohaException("<<NO_ERROR>> " + message) {
 }  // This message assumed not to be showed.
 
 Critical::Critical(const std::string &message)
-    : IrohaException("<<CRITICAL>> " + message) {}
+  : IrohaException("<<CRITICAL>> " + message) {}
 
 WontFix::WontFix(const std::string &message)
-    : IrohaException("<<WONT_FIX>> " + message) {}
+  : IrohaException("<<WONT_FIX>> " + message) {}
 
 Ordinary::Ordinary(const std::string &message)
-    : IrohaException("<<ERROR>> " + message) {}
+  : IrohaException("<<ERROR>> " + message) {}
 
 Insecure::Insecure(const std::string &message)
-    : IrohaException("<<INSECURE>> " + message) {}
+  : IrohaException("<<INSECURE>> " + message) {}
 
 
 None::None() : NoError("This exception should not be used in error") {}
 
 NotImplementedException::NotImplementedException(
-    const std::string &functionName, const std::string &filename)
-    : Ordinary("Sorry, function [" + functionName + "] in file " + filename +
-               " is not yet implemented, would you like to contribute it?") {}
+  const std::string &functionName, const std::string &filename)
+  : Ordinary("Sorry, function [" + functionName + "] in file " + filename +
+             " is not yet implemented, would you like to contribute it?") {}
 
 InvalidCastException::InvalidCastException(const std::string &from,
                                            const std::string &to,
                                            const std::string &filename)
-    : Ordinary("InvalidCastException in file " + filename +
-               ". Cannot cast from " + from + " to " + to) {}
+  : Ordinary("InvalidCastException in file " + filename +
+             ". Cannot cast from " + from + " to " + to) {}
 
 
 InvalidCastException::InvalidCastException(const std::string &meg,
                                            const std::string &filename)
-    : Ordinary("InvalidCastException in " + filename + ". " + meg) {}
+  : Ordinary("InvalidCastException in " + filename + ". " + meg) {}
 
 DuplicateSetArgumentException::DuplicateSetArgumentException(
-    const std::string &buildTarget, const std::string &duplicateMember)
-    : Ordinary("DuplicateSetArgumentException in " + buildTarget +
-               ", argument: " + duplicateMember) {}
+  const std::string &buildTarget, const std::string &duplicateMember)
+  : Ordinary("DuplicateSetArgumentException in " + buildTarget +
+             ", argument: " + duplicateMember) {}
 
 UnsetBuildArgumentsException::UnsetBuildArgumentsException(
-    const std::string &buildTarget, const std::string &unsetMembers)
-    : Ordinary("UnsetBuildArgumentsException in " + buildTarget +
-               ", arguments: " + unsetMembers) {}
+  const std::string &buildTarget, const std::string &unsetMembers)
+  : Ordinary("UnsetBuildArgumentsException in " + buildTarget +
+             ", arguments: " + unsetMembers) {}
 
 NotFoundPathException::NotFoundPathException(const std::string &path)
-    : Insecure("Not found path: '" + path + "'") {}
+  : Insecure("Not found path: '" + path + "'") {}
 
 RequirePropertyMissingException::RequirePropertyMissingException(
-        const std::string &buildTarget, const std::string &message)
-    : IrohaException("RequirePropertyMissingException in " + buildTarget +
-     ", message: " + message
+  const std::string &buildTarget, const std::string &message)
+  : IrohaException("RequirePropertyMissingException in " + buildTarget +
+                   ", message: " + message
 ) {}
 
 namespace config {
@@ -88,25 +89,25 @@ namespace config {
 // deprecated, will remove.
 ConfigException::ConfigException(const std::string &message,
                                  const std::string &funcname)
-    : Insecure("ConfigException: " + message + " in " + funcname) {}
+  : Insecure("ConfigException: " + message + " in " + funcname) {}
 
 ParseException::ParseException(const std::string &target,
                                bool setDefaultMessage)
-    : Insecure("Cannot parse '" + target + "'" +
-               (setDefaultMessage ? " It is set to be default." : "")) {}
+  : Insecure("Cannot parse '" + target + "'" +
+             (setDefaultMessage ? " It is set to be default." : "")) {}
 
 UndefinedIrohaHomeException::UndefinedIrohaHomeException()
-    : Critical(
-          "UndefinedIrohaHomeException: Set environment variable IROHA_HOME") {}
+  : Critical(
+  "UndefinedIrohaHomeException: Set environment variable IROHA_HOME") {}
 
 }  // namespace config
 
 namespace connection {
 NullptrException::NullptrException(const std::string &target)
-    : Ordinary("NullptrException: '" + target + "' is nullptr") {}
+  : Ordinary("NullptrException: '" + target + "' is nullptr") {}
 
 FailedToCreateConsensusEvent::FailedToCreateConsensusEvent()
-    : Ordinary("FailedToCreateConsensusEvent") {}
+  : Ordinary("FailedToCreateConsensusEvent") {}
 
 RPCConnectionException::RPCConnectionException(int code, const std::string& message)
   : Ordinary(std::string("RPCConnectionException:")
@@ -122,25 +123,25 @@ InvalidTransactionException::InvalidTransactionException()
 namespace service {
 
 DuplicationIPException::DuplicationIPException(const std::string &ip)
-    : Insecure("DuplicationIPException : IP = " + ip) {}
+  : Insecure("DuplicationIPException : IP = " + ip) {}
 
 DuplicationPublicKeyException::DuplicationPublicKeyException(
-    const std::string &publicKey)
-    : Insecure("DuplicationPublicKeyException : publicKey = " + publicKey) {}
+  const std::string &publicKey)
+  : Insecure("DuplicationPublicKeyException : publicKey = " + publicKey) {}
 
 UnExistFindPeerException::UnExistFindPeerException(const std::string &publicKey)
-    : Insecure("UnExistFindPeerException : publicKey = " + publicKey) {}
+  : Insecure("UnExistFindPeerException : publicKey = " + publicKey) {}
 
 }  // namespace service
 
 namespace crypto {
 
 InvalidKeyException::InvalidKeyException(const std::string &message)
-    : Insecure("Keyfile is invalid, cause is: " + message) {}
+  : Insecure("Keyfile is invalid, cause is: " + message) {}
 
 InvalidMessageLengthException::InvalidMessageLengthException(
-    const std::string &message)
-    : Insecure("Message " + message + " has wrong length") {}
+  const std::string &message)
+  : Insecure("Message " + message + " has wrong length") {}
 
 }  // namespace crypto
 

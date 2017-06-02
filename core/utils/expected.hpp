@@ -18,45 +18,45 @@
 #include "exception.hpp"
 
 class UnexpectedType {
- public:
+public:
   explicit UnexpectedType(std::exception_ptr&& excptr) noexcept;
   const std::exception_ptr& excptr() const noexcept;
 
- private:
+private:
   std::exception_ptr excptr_;
 };
 
 template <typename ExceptionType>
 UnexpectedType makeUnexpected(
-    ExceptionType&& exc,
-    typename std::enable_if<
-        std::is_base_of<std::exception, ExceptionType>::value>::type* =
-        nullptr) noexcept {
+  ExceptionType&& exc,
+  typename std::enable_if<
+    std::is_base_of<std::exception, ExceptionType>::value>::type* =
+  nullptr) noexcept {
   return UnexpectedType(std::make_exception_ptr(exc));
 }
 
 template <typename ExceptionPtrType>
 UnexpectedType makeUnexpected(
-    ExceptionPtrType&& excptr,
-    typename std::enable_if<
-        std::is_same<std::exception_ptr, ExceptionPtrType>::value>::type* =
-        nullptr) noexcept {
+  ExceptionPtrType&& excptr,
+  typename std::enable_if<
+    std::is_same<std::exception_ptr, ExceptionPtrType>::value>::type* =
+  nullptr) noexcept {
   return UnexpectedType(std::forward<ExceptionPtrType>(excptr));
 }
 
 template <typename T>
 class Expected {
- public:
+public:
   Expected(
-      T&& value,
-      typename std::enable_if<!std::is_same<T, UnexpectedType>::value>::type* =
-          0) noexcept
-      : value_(std::forward<T>(value)),
-        excptr_(std::make_exception_ptr(exception::None())),
-        valid_(true) {}
+    T&& value,
+    typename std::enable_if<!std::is_same<T, UnexpectedType>::value>::type* =
+    0) noexcept
+    : value_(std::forward<T>(value)),
+      excptr_(std::make_exception_ptr(exception::None())),
+      valid_(true) {}
 
   Expected(const UnexpectedType& exc) noexcept
-      : value_(T()), excptr_(exc.excptr()), valid_(false) {}
+    : value_(T()), excptr_(exc.excptr()), valid_(false) {}
 
   bool valid() const noexcept { return valid_; }
 
@@ -69,7 +69,7 @@ class Expected {
 
   T&& value_move() {
     if (!valid()) std::rethrow_exception(excptr());
-      return std::move(value_);
+    return std::move(value_);
   }
 
 
@@ -91,22 +91,22 @@ class Expected {
     }
   }
 
- private:
+private:
   T value_;
   std::exception_ptr excptr_;
   bool valid_;
 };
 
 class VoidHandler {
- public:
+public:
   VoidHandler() noexcept;
 
   template <typename T>
   VoidHandler(
-      T&& value,
-      typename std::enable_if<!std::is_same<T, UnexpectedType>::value>::type* =
-          0) noexcept
-      : excptr_(std::make_exception_ptr(exception::None())), valid_(true) {}
+    T&& value,
+    typename std::enable_if<!std::is_same<T, UnexpectedType>::value>::type* =
+    0) noexcept
+    : excptr_(std::make_exception_ptr(exception::None())), valid_(true) {}
 
   VoidHandler(const UnexpectedType& exc) noexcept;
 
@@ -117,7 +117,7 @@ class VoidHandler {
 
   std::string error() const;
 
- private:
+private:
   std::exception_ptr excptr_;
   bool valid_;
 };

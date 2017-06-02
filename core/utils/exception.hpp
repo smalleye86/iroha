@@ -23,83 +23,83 @@
 namespace exception {
 
 class IrohaException : public std::exception {
- public:
+public:
   explicit IrohaException(const std::string &);
 
   virtual ~IrohaException();
   virtual const char *what() const
-      throw();  // This is for throwing exception (auto appended '"');
+  throw();  // This is for throwing exception (auto appended '"');
   virtual std::string message() const;  // This is for getting exception message
 
- protected:
+protected:
 
   std::string message_;
 };
 
 class NoError : public IrohaException {
- public:
+public:
   explicit NoError(const std::string &);
 };
 
 // Iroha should halt.
 class Critical : public IrohaException {
- public:
+public:
   explicit Critical(const std::string &);
 };
 
 // used by debug.
 class WontFix : public IrohaException {
- public:
+public:
   explicit WontFix(const std::string &);
 };
 
 // No problem for running, but it is insecure. ex. using default private key.
 class Insecure : public IrohaException {
- public:
+public:
   explicit Insecure(const std::string &);
 };
 
 // no problem for running. Iroha manages for unstop.
 class Ordinary : public IrohaException {
- public:
+public:
   explicit Ordinary(const std::string &);
 };
 
 class None : public NoError {
- public:
+public:
   None();
 };
 
 class NotImplementedException : public Ordinary {
- public:
+public:
   explicit NotImplementedException(const std::string &functionName,
                                    const std::string &filename);
 };
 
 class InvalidCastException : public Ordinary {
- public:
+public:
   InvalidCastException(const std::string &from, const std::string &to,
                        const std::string &filename);
   InvalidCastException(const std::string &meg, const std::string &filename);
 };
 
 class DuplicateSetArgumentException : public Ordinary {
- public:
+public:
   DuplicateSetArgumentException(const std::string &, const std::string &);
 };
 
 class UnsetBuildArgumentsException : public Ordinary {
- public:
+public:
   UnsetBuildArgumentsException(const std::string &, const std::string &);
 };
 
 class RequirePropertyMissingException : public IrohaException {
 public:
-    RequirePropertyMissingException(const std::string &, const std::string &);
+  RequirePropertyMissingException(const std::string &, const std::string &);
 };
 
 class NotFoundPathException : public Insecure {
- public:
+public:
   NotFoundPathException(const std::string &path);
 };
 
@@ -107,17 +107,17 @@ namespace config {
 
 // deprecated, will remove
 class ConfigException : public Insecure {
- public:
+public:
   ConfigException(const std::string &message, const std::string &filename);
 };
 
 class ParseException : public Insecure {
- public:
+public:
   ParseException(const std::string &target, bool setDefaultMessage = false);
 };
 
 class UndefinedIrohaHomeException : public Critical {
- public:
+public:
   UndefinedIrohaHomeException();
 };
 
@@ -125,12 +125,12 @@ class UndefinedIrohaHomeException : public Critical {
 
 namespace connection {
 class NullptrException : public Ordinary {
- public:
+public:
   NullptrException(const std::string &target);
 };
 
 class FailedToCreateConsensusEvent : public Ordinary {
- public:
+public:
   FailedToCreateConsensusEvent();
 };
 
@@ -148,17 +148,17 @@ public:
 namespace service {
 
 class DuplicationIPException : public Insecure {
- public:
+public:
   explicit DuplicationIPException(const std::string &);
 };
 
 class DuplicationPublicKeyException : public Insecure {
- public:
+public:
   explicit DuplicationPublicKeyException(const std::string &);
 };
 
 class UnExistFindPeerException : public Insecure {
- public:
+public:
   explicit UnExistFindPeerException(const std::string &);
 };
 
@@ -167,12 +167,12 @@ class UnExistFindPeerException : public Insecure {
 namespace crypto {
 
 class InvalidKeyException : public Insecure {
- public:
+public:
   explicit InvalidKeyException(const std::string &);
 };
 
 class InvalidMessageLengthException : public Insecure {
- public:
+public:
   explicit InvalidMessageLengthException(const std::string &);
 };
 

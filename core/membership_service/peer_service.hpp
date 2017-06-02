@@ -101,7 +101,7 @@ std::shared_ptr<peer::Node> leader();
 }  // namespace service
 
 namespace transaction {
-namespace isssue {
+namespace issue {
 
 // invoke to issue transaction
 void add(const std::string &ip, const peer::Node &);
@@ -110,7 +110,7 @@ void setTrust(const std::string &ip, const std::string &, const double &);
 void changeTrust(const std::string &ip, const std::string &, const double &);
 void setActive(const std::string &ip, const std::string &, const bool active);
 
-}  // namespace isssue
+}  // namespace issue
 
 namespace executor {
 // invoke when execute transaction

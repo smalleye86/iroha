@@ -30,12 +30,12 @@ void check(const std::string &ip) {
   auto check_peer_it = *service::findPeerIP(ip);
   if (!connection::iroha::PeerService::Sumeragi::ping(ip)) {
     if (check_peer_it->trustScore < 0.0) {
-      transaction::isssue::remove(check_peer_it->publicKey);
+      transaction::issue::remove(check_peer_it->publicKey);
     } else {
-      transaction::isssue::distruct(check_peer_it->publicKey);
+      transaction::issue::distruct(check_peer_it->publicKey);
     }
   } else {
-    transaction::isssue::credit(check_peer_it->publicKey);
+    transaction::issue::credit(check_peer_it->publicKey);
   }
      */
 }

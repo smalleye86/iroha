@@ -15,17 +15,17 @@
 #include "expected.hpp"
 
 UnexpectedType::UnexpectedType(std::exception_ptr&& excptr) noexcept
-    : excptr_(excptr) {}
+  : excptr_(excptr) {}
 
 const std::exception_ptr& UnexpectedType::excptr() const noexcept {
   return excptr_;
 }
 
 VoidHandler::VoidHandler() noexcept
-    : excptr_(std::make_exception_ptr(exception::None())), valid_(true) {}
+  : excptr_(std::make_exception_ptr(exception::None())), valid_(true) {}
 
 VoidHandler::VoidHandler(const UnexpectedType& exc) noexcept
-    : excptr_(exc.excptr()), valid_(false) {}
+  : excptr_(exc.excptr()), valid_(false) {}
 
 std::string VoidHandler::error() const {
   try {

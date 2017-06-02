@@ -56,7 +56,7 @@ namespace peer{
     void peerStopStep() { // step2
       if( ::peer::myself::isActive() ) {
         ::peer::myself::stop();
-        ::peer::transaction::isssue::setActive(leader->ip,::peer::myself::getIp(),false);
+        ::peer::transaction::issue::setActive(leader->ip,::peer::myself::getIp(),false);
         detail::appending();
       }
       seekStartFetchIndex();
@@ -72,7 +72,7 @@ namespace peer{
     void peerActivateStep() { // step5;
       if( ::peer::myself::isActive() ) return;
       ::peer::myself::activate();
-      ::peer::transaction::isssue::setActive(leader->ip,::peer::myself::getIp(),true);
+      ::peer::transaction::issue::setActive(leader->ip,::peer::myself::getIp(),true);
     }
 
     namespace detail{

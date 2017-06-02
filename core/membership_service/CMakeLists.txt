@@ -1,21 +1,6 @@
-#ADD_LIBRARY(izanami STATIC
-#    izanami.cpp
-#)
-
-#target_link_libraries(izanami
-#    hash
-#    thread_pool
-#    config_manager
-#    peer_service
-#    executor
-#    connection_with_grpc
-#    transaction_repository
-#)
-
 ADD_LIBRARY(membership_service STATIC
     peer_service.cpp
-    hijiri.cpp
-    synchronizer.cpp)
+)
 
 target_link_libraries(membership_service
     timer
@@ -23,6 +8,6 @@ target_link_libraries(membership_service
     logger
     config_manager
     cache_map
-    flatbuffer_service
+    flatbuffers
     connection_with_grpc_flatbuffer
 )
