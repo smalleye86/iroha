@@ -13,35 +13,49 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
 #ifndef IROHA_TRANSACTION_BUILDER_HPP
 #define IROHA_TRANSACTION_BUILDER_HPP
 
 #include <transaction_generated.h>
 #include <primitives_generated.h>
 
+#include "primitive.hpp"
 #include <vector>
 
 namespace builder{
+
     using Timestamp = unsigned long;
+    using ubyte     = unsigned char;
+    using Signature   = protocol::Signature;
+    using Transaction = protocol::Transaction;
 
     class TransactionBuilder{
-        iroha::Signatrue            creator;
-        std::vector<Signature>      sigs;
-        Timestamp                   created;
-        std::vector<unsigned int>   nonce;
-        iroha::Action               action; 
 
-      public:
-        TranctionBuilder();
+        SignatureHolder              creator;
+        std::vector<SignatureHolder> sigs;
+        Timestamp                    created;
+        std::vector<uint32_t>        nonce;
+        flatbuffers::Offset<void>    action;
+        protocol::Action             action_type;
 
-        TransactionBuilder& setCreator(const iroha::Signatrue&);
-        TransactionBuilder& setSigs(const std::vector<Signature>&);
+        enum class State{
+            UnderConstruction,
+            AfterConstruction
+        } state;
+
+    public:
+        TransactionBuilder();
+
+        TransactionBuilder& setCreator(const Signature&);
+        TransactionBuilder& setSigs(const    std::vector<Signature>&&);
+        TransactionBuilder& addSig(const     Signature&&);
+
         TransactionBuilder& setCreated(const Timestamp&);
-        TransactionBuilder& setNonce(const std::vector<unsigned int>&);
-        TransactionBuilder& setAction(const iroha::Action&);
+        TransactionBuilder& setNonce(const   std::vector<uint32_t>&);
+        TransactionBuilder& setAction(const protocol::Action&,const  flatbuffers::Offset<void>&);
 
-        Transaction build();
+        flatbuffers::Offset<Transaction> buildOffset(flatbuffers::FlatBufferBuilder& fbb);
+        flatbuffers::BufferRef<Transaction> buildBufferRef(flatbuffers::FlatBufferBuilder& fbb);
     };
 
 };
