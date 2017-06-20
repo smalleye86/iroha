@@ -1,6 +1,5 @@
-# Temporary comment-outed for compilation
-#compile_proto_to_cpp     (api.proto)
-#compile_proto_to_grpc_cpp(api_service.proto)
+compile_proto_to_cpp     (api.proto)
+compile_proto_to_grpc_cpp(api_service.proto)
 
 compile_proto_to_cpp(asset.proto)
 compile_proto_to_cpp(block.proto)

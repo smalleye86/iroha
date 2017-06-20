@@ -17,7 +17,6 @@ limitations under the License.
 #ifndef CONNECTION_SERVER_RUNNER_HPP
 #define CONNECTION_SERVER_RUNNER_HPP
 
-
 #include <grpc++/server.h>
 #include <grpc++/server_builder.h>
 #include <grpc++/server_context.h>
@@ -27,17 +26,18 @@ limitations under the License.
 
 namespace connection {
 
-    ServerRunner::ServerRunner(const std::string& ip,
-                               const std::vector<grpc::Service*>& services) {
-        grpc::ServerBuilder builder;
+  ServerRunner::ServerRunner(const std::string& ip,
+                             const std::vector<grpc::Service*>& services) {
 
-        builder.AddListeningPort(ip, grpc::InsecureServerCredentials());
-        for (auto s: services) {
-            builder.RegisterService(s);
-        }
-        std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
-        server->Wait();
+    grpc::ServerBuilder builder;
+
+    builder.AddListeningPort(ip, grpc::InsecureServerCredentials());
+    for (auto s : services) {
+      builder.RegisterService(s);
     }
+    std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
+    server->Wait();
+  }
 
 }  // namespace connection
 

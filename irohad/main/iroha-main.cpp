@@ -21,19 +21,23 @@ limitations under the License.
 
 #include "server_runner.hpp"
 
-int main(int argc,char* argv[]) {
+#include <api/api_service.hpp>
 
-  connection::api::CommandService commandService;
-  connection::api::QueryService queryService;
-  connection::consensus::SumeragiService sumeragiService;
-  connection::ordering::OrderingService orderingService;
+int main(int argc, char* argv[]) {
+  //  connection::api::CommandService commandService;
+  //  connection::api::QueryService queryService;
+  //  connection::consensus::SumeragiService sumeragiService;
+  //  connection::ordering::OrderingService orderingService;
+  //
+  //  connection::ServerRunner serverRunner("0.0.0.0:12345", {
+  //      &commandService,
+  //      &queryService,
+  //      &sumeragiService,
+  //      &orderingService
+  //  });
 
-  connection::ServerRunner serverRunner("0.0.0.0", {
-      &commandService,
-      &queryService,
-      &sumeragiService,
-      &orderingService
-  });
+  iroha::AsyncServerImpl asyncServer;
+  asyncServer.Run("0.0.0.0", 12345);
 
   return 0;
 }
