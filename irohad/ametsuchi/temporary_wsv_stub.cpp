@@ -16,21 +16,13 @@
  */
 
 #include <ametsuchi/temporary_wsv_stub.hpp>
-#include <functional>
+#include <stdexcept>
 
 namespace iroha {
 
   namespace ametsuchi {
 
-    bool TemporaryWsvStub::apply(
-        dao::Transaction transaction,
-        std::function<bool(dao::Transaction &, CommandExecutor &, WsvQuery &)>
-        function) {
-      return function(transaction, executor_, ametsuchi_);
-    }
-
-    dao::Account TemporaryWsvStub::get_account(
-        ed25519::pubkey_t pub_key) {
+    dao::Account TemporaryWsvStub::get_account(ed25519::pubkey_t pub_key) {
       return ametsuchi_.get_account(pub_key);
     }
 
@@ -58,6 +50,24 @@ namespace iroha {
 
     TemporaryWsvStub::TemporaryWsvStub(AmetsuchiStub &ametsuchi)
         : ametsuchi_(ametsuchi), executor_(*this) {}
+
+    rxcpp::observable<dao::Command> TemporaryWsvStub::apply(
+        const dao::Transaction &transaction) {
+      auto on_subscribe = [&transaction,
+                           this](rxcpp::subscriber<dao::Command> s) {
+        auto &cmds = transaction.commands;
+        for (auto it = cmds.begin(); it != cmds.end() && s.is_subscribed();
+             ++it) {
+          auto &cmd = *it;
+          if (executor_.execute(cmd)) {
+            s.on_next(cmd);
+          } else {
+            s.on_error(std::make_exception_ptr(std::runtime_error("")));
+          }
+        }
+      };
+      return rxcpp::observable<>::create<dao::Command>(on_subscribe);
+    }
   }
 
 }  // namespace iroha

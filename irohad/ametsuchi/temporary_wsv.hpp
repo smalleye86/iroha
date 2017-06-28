@@ -22,7 +22,7 @@
 #include <ametsuchi/wsv_query.hpp>
 #include <dao/block.hpp>
 #include <dao/transaction.hpp>
-#include <functional>
+#include <rxcpp/rx-observable.hpp>
 
 namespace iroha {
 
@@ -35,24 +35,14 @@ namespace iroha {
     class TemporaryWsv : public WsvQuery {
      public:
       /**
-       * Applies a transaction to current state
-       * using logic specified in function
+       * Applies a transaction to current state using @see CommandExecutor
        * @param transaction Transaction to be applied
-       * @param function Function that specifies the logic used to apply the
-       * transaction
-       * Function parameters:
-       *  - Transaction @see transaction
-       *  - CommandExecutor
-       *  - WSVQuery
-       * Function returns true if the transaction is successfully applied, false
-       * otherwise.
-       * @return True if transaction was successfully applied, false otherwise
-       *
+       * @return Observable with applied commands
+       * Stops calling onNext() if there are no subscribers
+       * Calls onError() if it failed to apply a command
        */
-      virtual bool apply(
-          dao::Transaction transaction,
-          std::function<bool(dao::Transaction&, CommandExecutor&, WsvQuery&)>
-              function) = 0;
+      virtual rxcpp::observable<dao::Command> apply(
+          const dao::Transaction &transaction) = 0;
     };
 
   }  // namespace ametsuchi
